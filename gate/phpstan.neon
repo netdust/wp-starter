@@ -9,6 +9,18 @@ includes:
 
 parameters:
     level: 6
+    # Project-local cache — NEVER the shared system tmp. PHPStan's default
+    # tmpDir (sys_get_temp_dir()/phpstan) is shared by every project on the
+    # host: stale reflection entries pointing at another project's (since
+    # deleted/moved) phpstan.phar poison a fresh site's FIRST `composer gate`
+    # with "phar://…/phpstan.phar/….stub is not a file" internal errors
+    # (hit on the T04 acceptance run via a stale gate-pilot cache).
+    # Relative path → resolved beside this file, i.e. the project root.
+    # The dir ships with the gate payload and self-ignores (.gitignore inside).
+    # Coupling: run ALL phpstan invocations from ONE context (the host — the
+    # gate is host-orchestrated); a container run would seed this shared,
+    # mounted cache with container paths and recreate the same poisoning.
+    tmpDir: .phpstan-cache
     scanFiles:
         # WP test-scaffold symbols (WP_UnitTestCase & friends) for the
         # integration tier under tests/Integration — discovery only, the
