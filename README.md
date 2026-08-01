@@ -7,7 +7,8 @@ regardless of stack (bedrock | stackwp):
   copied **verbatim**
 - **clean starter theme** — copied then rendered with slug tokens
 - **gate layer** — `gate/` mirrors the project root (bin/, tests/, phpunit/phpstan/phpcs
-  configs, playwright, root `package.json` e2e harness, `.ddev/` gate additions),
+  configs, playwright, root `package.json` + `package-lock.json` e2e harness,
+  `.ddev/` gate additions),
   copied to the project root then rendered with the gate tokens (absorbed from
   `netdust/bedrock` in T02 of `specs/new-site-stack-choice`)
 
