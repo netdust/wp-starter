@@ -10,7 +10,8 @@ import { test, expect } from '@playwright/test';
  * site-name coupling (I6) anywhere in this spec.
  *
  * Uses plain @playwright/test rather than @wordpress/e2e-test-utils-playwright
- * fixtures: on Bedrock the admin lives at /wp/wp-admin (core in {{GATE_WP_DIR}}), and
+ * fixtures: in the stack layout (rendered by scaffold_wp_starter) the admin
+ * lives at /wp/wp-admin (core in {{GATE_WP_DIR}}), and
  * the utils' RequestUtils/Admin helpers hardcode <baseURL>/wp-admin. The utils
  * package stays installed as the documented layer for future non-path-coupled
  * helpers.

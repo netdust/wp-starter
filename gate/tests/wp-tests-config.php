@@ -5,7 +5,7 @@
  *
  * Points the wp-phpunit scaffold at the DEDICATED `wptests` database
  * (provisioned by the .ddev/config.gates.yaml post-start hook) and resolves
- * the Bedrock layout: core in {{GATE_WP_DIR}}, content in {{GATE_CONTENT_DIR}}.
+ * the stack layout (rendered by scaffold_wp_starter): core in {{GATE_WP_DIR}}, content in {{GATE_CONTENT_DIR}}.
  *
  * Fully portable (review C4 I6): the scaffold installs its OWN WordPress
  * into wptests, so the domain/email/title are the wp-phpunit canonical
@@ -22,7 +22,7 @@
 
 declare(strict_types=1);
 
-// Bedrock layout: WordPress core lives in {{GATE_WP_DIR}} (trailing slash required).
+// Stack layout (rendered by scaffold_wp_starter): WordPress core lives in {{GATE_WP_DIR}} (trailing slash required).
 define('ABSPATH', dirname(__DIR__) . '/{{GATE_WP_DIR}}/');
 define('WP_CONTENT_DIR', dirname(__DIR__) . '/{{GATE_CONTENT_DIR}}');
 define('WP_CONTENT_URL', 'http://example.org/app');
