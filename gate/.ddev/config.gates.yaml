@@ -10,4 +10,8 @@ hooks:
     # DDEV MariaDB root credentials are root/root; the `db` user gets full
     # rights on wptests so the test suite connects with the same
     # credentials the app already uses.
+    # Back-pointer: this provisioning is mirrored INLINE by
+    # netdust-wp-manager scripts/new-site.sh (this payload lands post-start
+    # on the first scaffold, so the hook hasn't fired yet) — change BOTH
+    # when touching the DB name or credentials.
     - exec: mysql -uroot -proot -hdb -e "CREATE DATABASE IF NOT EXISTS wptests; GRANT ALL ON wptests.* TO 'db'@'%';"
