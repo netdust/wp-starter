@@ -1,0 +1,13 @@
+# Gate-harness DDEV additions (kept OUT of config.yaml on purpose:
+# `ddev config` regenerates config.yaml, while every config.*.yaml is merged
+# in — this file survives regeneration).
+hooks:
+  post-start:
+    # Provision the dedicated integration-test database. The integration
+    # tier (composer test:int) runs ONLY against `wptests` — never the dev
+    # database `db`. The wp-phpunit scaffold drops/recreates tables in its
+    # target DB, so the dev database must never be that target.
+    # DDEV MariaDB root credentials are root/root; the `db` user gets full
+    # rights on wptests so the test suite connects with the same
+    # credentials the app already uses.
+    - exec: mysql -uroot -proot -hdb -e "CREATE DATABASE IF NOT EXISTS wptests; GRANT ALL ON wptests.* TO 'db'@'%';"

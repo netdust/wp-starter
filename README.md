@@ -6,14 +6,18 @@ regardless of stack (bedrock | stackwp):
 - **ntdst-core mu-plugin** — the framework (`core/ api/ services/ assets/`),
   copied **verbatim**
 - **clean starter theme** — copied then rendered with slug tokens
-- **gate layer** — arrives in T02 of `specs/new-site-stack-choice`
+- **gate layer** — `gate/` mirrors the project root (bin/, tests/, phpunit/phpstan/phpcs
+  configs, playwright, root `package.json` e2e harness, `.ddev/` gate additions),
+  copied to the project root then rendered with the gate tokens (absorbed from
+  `netdust/bedrock` in T02 of `specs/new-site-stack-choice`)
 
 ```
 wp-starter/
 ├── mu-plugins/
 │   ├── ntdst-coreloader.php   ← copied verbatim into the site's mu-plugins/
 │   └── ntdst-core/            ← copied verbatim (the framework: core/ api/ services/ assets/)
-└── theme/                     ← copied to the site's themes/<slug>/, then tokens rendered
+├── theme/                     ← copied to the site's themes/<slug>/, then tokens rendered
+└── gate/                      ← copied to the project ROOT (merge .ddev/), then gate tokens rendered
 ```
 
 ## Token vocabulary
@@ -27,7 +31,12 @@ Rendered by `scaffold_wp_starter` in `netdust-wp-manager/scripts/scaffold-meta.s
 | `{{SLUG_CONST}}` | `TODAI_CLIENT` | constants (VERSION/DIR/URI) |
 | `{{SLUG_TITLE}}` | `Todai Client` | style.css Theme Name |
 
-Gate tokens `{{GATE_WP_DIR}}` / `{{GATE_CONTENT_DIR}}` arrive in T02.
+Gate tokens, rendered by `scaffold_wp_starter` across the copied `gate/` files:
+
+| Token | bedrock | stackwp | Meaning |
+|---|---|---|---|
+| `{{GATE_WP_DIR}}` | `web/wp` | `app/wp` | WordPress core dir, relative to project root |
+| `{{GATE_CONTENT_DIR}}` | `web/app` | `app/content` | Content dir (mu-plugins/, themes/), relative to project root |
 
 ## Consumers
 
