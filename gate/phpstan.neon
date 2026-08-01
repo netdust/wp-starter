@@ -3,8 +3,9 @@ includes:
     # Pre-existing findings in the vendored framework + theme, frozen at gate
     # introduction. New code must be clean; do not add to this file.
     # Coupling: the baseline references {{GATE_CONTENT_DIR}}/mu-plugins/ntdst-core + the theme —
-    # vendored via the wp-starter snapshot (see netdust-wp-manager/templates/wp-starter),
-    # regenerate with --generate-baseline after bumping the snapshot.
+    # both live in THIS repo (netdust/wp-starter) and are rendered into a
+    # project by scaffold_wp_starter; regenerate with --generate-baseline
+    # after changing the vendored framework or theme.
     - phpstan-baseline.neon
 
 parameters:
