@@ -15,7 +15,7 @@ stderr, and propagates its real exit code (`bin/gate.sh`).
 |---|---|---|---|---|---|
 | 1 | `composer lint` | `ddev lint` | phpcs: PSR-12 + WordPress Security/DB sniffs + PHP-compat (8.3) — currently scoped to `tests/` (see phpcs.xml); widen as mu-plugin/theme debt is paid | either | < 1 s |
 | 2 | `composer lint:js` | `ddev lint-js` | ESLint + Stylelint, per theme package | either | ~1 s |
-| 3 | `composer analyse` | `ddev analyse` | PHPStan static analysis | either | ~1 s |
+| 3 | `composer analyse` | `ddev analyse` | PHPStan static analysis | **host only** — the phpstan cache is context-coupled; a container run poisons the mounted cache for the host-orchestrated gate | ~1 s |
 | 4 | `composer audit:deps` | `ddev audit` | `composer audit` + `npm audit --audit-level=high` (theme) | either | ~3 s |
 | 5 | `composer test:unit` | `ddev test-unit` | PHP unit tier: Brain Monkey, no WordPress, no DB | either | ~1 s |
 | 6 | `composer test:js` | `ddev test-js` | Vitest: theme JS unit tests | either | ~1.5 s |
