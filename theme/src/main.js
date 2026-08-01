@@ -110,7 +110,7 @@ window.ntdstAPI = {
       credentials: 'same-origin',
       headers: {
         'Content-Type': 'application/json',
-        'X-WP-Nonce': window.todaiConfig?.restNonce || '',
+        'X-WP-Nonce': window.{{SLUG_SNAKE}}Config?.restNonce || '',
       },
       body: JSON.stringify({ action }),
     });
@@ -129,7 +129,7 @@ window.ntdstAPI = {
       credentials: 'same-origin',
       headers: {
         'Content-Type': 'application/json',
-        'X-WP-Nonce': window.todaiConfig?.restNonce || '',
+        'X-WP-Nonce': window.{{SLUG_SNAKE}}Config?.restNonce || '',
       },
       body: JSON.stringify({ action, nonce, ...params }),
     });
@@ -154,6 +154,6 @@ window.ntdstAPI = {
 
 Alpine.start();
 
-if (window.todaiConfig?.debug) {
+if (window.{{SLUG_SNAKE}}Config?.debug) {
   console.log('{{SLUG_TITLE}} frontend initialized');
 }

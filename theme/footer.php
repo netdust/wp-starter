@@ -35,7 +35,7 @@ defined('ABSPATH') || exit;
                             'theme_location' => 'footer',
                             'container'      => false,
                             'menu_class'     => 'space-y-2',
-                            'walker'         => new Todai_Client_Nav_Walker(),
+                            'walker'         => new Ntdst_Nav_Walker(),
                         ]);
                     }
                     ?>

@@ -24,7 +24,7 @@ get_header();
         </header>
 
         <div class="container py-8 lg:py-12">
-            <div class="prose-todai max-w-content">
+            <div class="prose-{{SLUG}} max-w-content">
                 <?php the_content(); ?>
             </div>
         </div>

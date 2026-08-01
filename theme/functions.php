@@ -89,7 +89,7 @@ if (class_exists('NTDST_Theme')) {
  * active state, and appends a chevron icon to top-level items that have
  * children. No dropdown markup, no LMS classes — add what the brand needs.
  */
-class Todai_Client_Nav_Walker extends Walker_Nav_Menu
+class Ntdst_Nav_Walker extends Walker_Nav_Menu
 {
     public function start_el(&$output, $item, $depth = 0, $args = null, $id = 0): void
     {

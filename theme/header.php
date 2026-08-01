@@ -53,7 +53,7 @@ defined('ABSPATH') || exit;
                         'container'      => false,
                         'menu_class'     => 'flex items-center gap-1',
                         'fallback_cb'    => '{{SLUG_SNAKE}}_fallback_menu',
-                        'walker'         => new Todai_Client_Nav_Walker(),
+                        'walker'         => new Ntdst_Nav_Walker(),
                     ]);
                     ?>
                 </nav>
@@ -84,7 +84,7 @@ defined('ABSPATH') || exit;
                         'container'      => false,
                         'menu_class'     => 'space-y-1',
                         'fallback_cb'    => '{{SLUG_SNAKE}}_fallback_menu',
-                        'walker'         => new Todai_Client_Nav_Walker(),
+                        'walker'         => new Ntdst_Nav_Walker(),
                     ]);
                     ?>
                 </nav>

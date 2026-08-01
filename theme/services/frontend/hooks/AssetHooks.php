@@ -7,7 +7,7 @@ use NTDST_Theme;
 
 /**
  * Vite asset pipeline: dev-server fork in WP_DEBUG, manifest-driven enqueue
- * in production, and the inline `window.todaiConfig` payload.
+ * in production, and the inline `window.{{SLUG_SNAKE}}Config` payload.
  *
  * Kept as a closure-wrapping class because the manifest dance and the
  * conditional `script_loader_tag` filter don't fit the data-driven
@@ -36,7 +36,7 @@ final class AssetHooks
             $this->enqueueBuiltAssets();
         }
 
-        wp_add_inline_script(self::HANDLE, 'window.todaiConfig = ' . wp_json_encode([
+        wp_add_inline_script(self::HANDLE, 'window.{{SLUG_SNAKE}}Config = ' . wp_json_encode([
             'restNonce' => wp_create_nonce('wp_rest'),
             'debug'     => defined('WP_DEBUG') && WP_DEBUG,
             'strings'   => [

@@ -136,18 +136,18 @@
      PROSE (Content Areas)
      ══════════════════════════════════════ */
 
-  .prose-todai {
+  .prose-{{SLUG}} {
     @apply text-text leading-relaxed;
   }
 
-  .prose-todai h2 { @apply font-heading text-2xl font-bold mt-10 mb-4; }
-  .prose-todai h3 { @apply font-heading text-xl font-semibold mt-8 mb-3; }
-  .prose-todai p  { @apply mb-4; }
-  .prose-todai ul { @apply list-disc pl-5 mb-4 space-y-1; }
-  .prose-todai ol { @apply list-decimal pl-5 mb-4 space-y-1; }
-  .prose-todai a  { @apply text-primary underline hover:text-primary-dark; }
+  .prose-{{SLUG}} h2 { @apply font-heading text-2xl font-bold mt-10 mb-4; }
+  .prose-{{SLUG}} h3 { @apply font-heading text-xl font-semibold mt-8 mb-3; }
+  .prose-{{SLUG}} p  { @apply mb-4; }
+  .prose-{{SLUG}} ul { @apply list-disc pl-5 mb-4 space-y-1; }
+  .prose-{{SLUG}} ol { @apply list-decimal pl-5 mb-4 space-y-1; }
+  .prose-{{SLUG}} a  { @apply text-primary underline hover:text-primary-dark; }
 
-  .prose-todai blockquote {
+  .prose-{{SLUG}} blockquote {
     @apply border-l-4 border-primary/30 pl-4 italic text-text-muted;
   }
 

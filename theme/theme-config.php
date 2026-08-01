@@ -46,9 +46,9 @@ return [
     // Format: [width, height, crop, label]
     // ========================================
     'image_sizes' => [
-        'todai_thumbnail' => [150, 150, true, 'Thumbnail'],
-        'todai_card' => [400, 225, true, 'Card'],
-        'todai_wide' => [1200, 675, true, 'Wide'],
+        '{{SLUG_SNAKE}}_thumbnail' => [150, 150, true, 'Thumbnail'],
+        '{{SLUG_SNAKE}}_card' => [400, 225, true, 'Card'],
+        '{{SLUG_SNAKE}}_wide' => [1200, 675, true, 'Wide'],
     ],
 
     // ========================================

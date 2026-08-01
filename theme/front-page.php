@@ -44,7 +44,7 @@ if (have_posts()) :
             ?>
             <section class="section-alt">
                 <div class="container">
-                    <div class="prose-todai max-w-content mx-auto">
+                    <div class="prose-{{SLUG}} max-w-content mx-auto">
                         <?php the_content(); ?>
                     </div>
                 </div>

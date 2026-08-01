@@ -26,11 +26,11 @@ get_header();
         <div class="container py-8 lg:py-12">
             <?php if (has_post_thumbnail()) : ?>
                 <div class="max-w-content mb-8 overflow-hidden rounded-xl">
-                    <?php the_post_thumbnail('todai_wide', ['class' => 'w-full h-auto']); ?>
+                    <?php the_post_thumbnail('{{SLUG_SNAKE}}_wide', ['class' => 'w-full h-auto']); ?>
                 </div>
             <?php endif; ?>
 
-            <div class="prose-todai max-w-content">
+            <div class="prose-{{SLUG}} max-w-content">
                 <?php
                 the_content();
 

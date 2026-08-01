@@ -28,7 +28,7 @@ get_header();
                 <article <?php post_class('card p-6'); ?>>
                     <?php if (has_post_thumbnail()) : ?>
                         <a href="<?php the_permalink(); ?>" class="block mb-4 overflow-hidden rounded-lg">
-                            <?php the_post_thumbnail('todai_card', ['class' => 'w-full h-auto']); ?>
+                            <?php the_post_thumbnail('{{SLUG_SNAKE}}_card', ['class' => 'w-full h-auto']); ?>
                         </a>
                     <?php endif; ?>
 

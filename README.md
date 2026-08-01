@@ -25,12 +25,12 @@ wp-starter/
 
 Rendered by `scaffold_wp_starter` in `netdust-wp-manager/scripts/scaffold-meta.sh`:
 
-| Token | Example (`todai-client`) | Where |
+| Token | Example (`acme-client`) | Where |
 |---|---|---|
-| `{{SLUG}}` | `todai-client` | dir name, textdomain, handles, asset paths |
-| `{{SLUG_SNAKE}}` | `todai_client` | PHP namespace |
-| `{{SLUG_CONST}}` | `TODAI_CLIENT` | constants (VERSION/DIR/URI) |
-| `{{SLUG_TITLE}}` | `Todai Client` | style.css Theme Name |
+| `{{SLUG}}` | `acme-client` | dir name, textdomain, handles, asset paths |
+| `{{SLUG_SNAKE}}` | `acme_client` | PHP namespace |
+| `{{SLUG_CONST}}` | `ACME_CLIENT` | constants (VERSION/DIR/URI) |
+| `{{SLUG_TITLE}}` | `Acme Client` | style.css Theme Name |
 
 Gate tokens, rendered by `scaffold_wp_starter` across the copied `gate/` files:
 
@@ -50,11 +50,11 @@ Advance ntdst-core **here** (commits, tags). This repo is the source of truth
 for the framework payload — it replaces the old "snapshot bumped from Stride"
 model.
 
-**Known defect — fix at the next framework advance:** the theme's JS config
-handle is `window.todaiConfig` (a Stride/Tōdai leftover) — rename it to a
-project-neutral handle, together with its PHP-side localization
-(`wp_add_inline_script` in `theme/services/frontend/hooks/AssetHooks.php`) and
-the readers in `theme/src/main.js`.
+The theme's JS config handle is `window.{{SLUG_SNAKE}}Config` — emitted by the
+PHP side (`wp_add_inline_script` in
+`theme/services/frontend/hooks/AssetHooks.php`) and read in
+`theme/src/main.js`; both render from the same token, so they stay consistent
+per site.
 
 ## Theme
 
