@@ -50,6 +50,12 @@ Advance ntdst-core **here** (commits, tags). This repo is the source of truth
 for the framework payload — it replaces the old "snapshot bumped from Stride"
 model.
 
+**Before pushing payload changes, run `sh gate/bin/lint-tokens.sh`** (exit 0 =
+clean). It fails on layout literals (`web/wp`, `app/content`, …) that should be
+`{{GATE_WP_DIR}}` / `{{GATE_CONTENT_DIR}}` tokens. A hardcoded path is
+correct-by-coincidence on a Bedrock render and silently wrong on a stackwp one,
+so nothing catches it until a stackwp site's gate goes red.
+
 The theme's JS config handle is `window.{{SLUG_SNAKE}}Config` — emitted by the
 PHP side (`wp_add_inline_script` in
 `theme/services/frontend/hooks/AssetHooks.php`) and read in
