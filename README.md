@@ -5,7 +5,10 @@ regardless of stack (bedrock | stackwp):
 
 - **ntdst-core mu-plugin** — the framework (`core/ api/ services/ assets/`),
   copied **verbatim**
-- **clean starter theme** — copied then rendered with slug tokens
+- **theme, selected by PRESET** — copied then rendered with slug tokens:
+  - `theme/` (preset `plain`, default) — self-rendering theme (Tailwind/Alpine/Vite)
+  - `theme-yootheme/` (preset `yootheme`) — YOOtheme Pro **child**: no template
+    files, no CSS toolchain, styling in `less/theme.<slug>.less`
 - **gate layer** — `gate/` mirrors the project root (bin/, tests/, phpunit/phpstan/phpcs
   configs, playwright, root `package.json` + `package-lock.json` e2e harness,
   `.ddev/` gate additions),
@@ -17,7 +20,8 @@ wp-starter/
 ├── mu-plugins/
 │   ├── ntdst-coreloader.php   ← copied verbatim into the site's mu-plugins/
 │   └── ntdst-core/            ← copied verbatim (the framework: core/ api/ services/ assets/)
-├── theme/                     ← copied to the site's themes/<slug>/, then tokens rendered
+├── theme/                     ← preset `plain`  → themes/<slug>/, then tokens rendered
+├── theme-yootheme/            ← preset `yootheme` → same, but a YOOtheme CHILD
 └── gate/                      ← copied to the project ROOT (merge .ddev/), then gate tokens rendered
 ```
 
@@ -31,6 +35,7 @@ Rendered by `scaffold_wp_starter` in `netdust-wp-manager/scripts/scaffold-meta.s
 | `{{SLUG_SNAKE}}` | `acme_client` | PHP namespace |
 | `{{SLUG_CONST}}` | `ACME_CLIENT` | constants (VERSION/DIR/URI) |
 | `{{SLUG_TITLE}}` | `Acme Client` | style.css Theme Name |
+| `{{GATE_CONTENT_BASE}}` | `content` (stackwp) / `app` (bedrock) | Vite `base` — the content dir MINUS the docroot, i.e. the public URL prefix |
 
 Gate tokens, rendered by `scaffold_wp_starter` across the copied `gate/` files:
 
@@ -76,3 +81,37 @@ vite 7, committed package-lock) extracted from the gate-harness pilot
 (`~/Sites/gate-pilot`) on 2026-07-31 — see `specs/wp-gate-harness` in
 netdust-wp-manager (pilot deleted after extraction; evidence preserved in
 `specs/wp-gate-harness/` + each project's `docs/gate-falsifiability.md`).
+
+
+## Presets
+
+`new-site.sh --preset=<plain|yootheme>` selects the theme payload;
+`scaffold_wp_starter` maps preset → dir and HARD-ERRORS on an unknown value
+(never a silent fallback to `plain`).
+
+**STACK and PRESET are independent axes.** Stack is the project LAYOUT (bedrock
+`web/app` vs stackwp `app/content`); preset is the THEME SHAPE. A YOOtheme site
+can be either stack — 5 of 7 Netdust sites are YOOtheme, across both.
+
+### `theme-yootheme/`
+
+A YOOtheme Pro **child**. What makes it different from `theme/`:
+
+- **No template files.** No `header/footer/page/single/index/404/front-page/
+  searchform.php`, no `partials/`, no nav walker. Those override the parent and
+  bypass the builder — the whole point of YOOtheme.
+- **`Template: yootheme`** in `style.css`. This is what makes it a child.
+- **No CSS toolchain.** No Tailwind/PostCSS/stylelint, no `src/css/`. Styling is
+  `less/theme.{{SLUG}}.less`, renamed to the real slug at scaffold time because
+  YOOtheme derives the style ID from the filename.
+- Vite is retained for **JS only** (Alpine).
+
+The `less/` skeleton is generated from the same source as
+`netdust-wp:ntdst-yootheme → templates/theme.child.less.md`; keep them in sync.
+
+**The YOOtheme Pro PARENT is not in this payload** — ~41MB and licensed. It is
+never committed and never fetched from a public source. `new-site.sh` copies it
+from `YOOTHEME_PARENT_DIR` (default `~/Sites/_assets/yootheme`) and, if absent,
+scaffolds the child but does NOT activate it — because activating a child with
+no parent silently pins the `template` option to the child, and activating the
+parent later does not repair it.

@@ -1,0 +1,26 @@
+/*
+Theme Name: {{SLUG_TITLE}}
+Theme URI: https://netdust.be
+Template: yootheme
+Author: Netdust
+Author URI: https://netdust.be
+Description: YOOtheme Pro child theme for {{SLUG_TITLE}}, wired into ntdst-core. YOOtheme's builder owns rendering, so this child deliberately carries NO template files; styling lives in less/theme.{{SLUG}}.less. Alpine + Vite handle JS only.
+Version: 1.0.0
+Requires at least: 6.4
+Tested up to: 6.5
+Requires PHP: 8.1
+License: GNU General Public License v2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: {{SLUG}}
+Tags: yootheme, alpine, vite, ntdst-core, starter
+
+The `Template: yootheme` line above is what makes this a CHILD of YOOtheme Pro.
+Without it WordPress treats this as a standalone theme and the builder never runs.
+
+WARNING: activating a child does NOT rewrite the `template` option. If this theme
+was ever activated BEFORE that line existed, activate the PARENT first, then
+re-activate this one, and verify get_template_directory() points at yootheme/.
+
+Styling: less/theme.{{SLUG}}.less (select it in Customizer -> Theme -> Style).
+JS: `npm run dev` / `npm run build` (Vite). There is no CSS build.
+*/

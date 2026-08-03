@@ -1,0 +1,224 @@
+/*
+
+Name: {{SLUG_TITLE}}
+Background: Light
+Color: Grey
+Type: Flat
+
+*/
+
+// ========================================================================
+// {{SLUG_TITLE}} — YOOtheme style
+//
+// Maps the {{SLUG_TITLE}} design system onto YOOtheme / UIkit theme variables, so
+// every element built in the YOOtheme builder inherits the correct font,
+// colour, spacing and radius automatically.
+//
+// Select it in: Customizer → Theme → Style → "{{SLUG_TITLE}}".
+//
+// SOURCE OF TRUTH for section 1 is <the design file / tokens.css / Figma URL>.
+//
+// ⚠ THIS FILE IS THE SOURCE OF TRUTH FOR THE TOKENS — NOT THE CUSTOMIZER.
+// The Customizer exposes variables by PATTERN whitelist (config/styler.php), so
+// the two halves of this file behave DIFFERENTLY there:
+//   - section 2's mappings (@global-*, @base-*, @button-*, @card-*, @navbar-*,
+//     @inverse-*) DO appear as editable fields;
+//   - section 1's @{{SLUG_SNAKE}}-* tokens match no pattern and never appear.
+// Editing a colour under Customizer → Global → Colors overrides the MAPPED
+// value while the token it derived FROM still reads the old one. They diverge
+// silently, the DB copy wins at runtime, and this file goes stale.
+// So: change brand values HERE. Use the Customizer for fonts and per-page work.
+// ========================================================================
+
+// NOTE: this style lives in the CHILD theme. YOOtheme discovers it by globbing
+// {rootDir,childDir}/less/theme.*.less (packages/styler/src/Styler.php), and
+// resolves @import paths relative to THIS file — so each import below reaches
+// the parent via ../../yootheme/…
+@import "../../yootheme/less/platform.less";
+@import "../../yootheme/vendor/assets/uikit/src/less/uikit.less";
+@import "../../yootheme/vendor/assets/uikit-themes/master/_import.less";
+@import "../../yootheme/less/theme.less";
+
+
+// ========================================================================
+// 1. {{SLUG_TITLE}} TOKENS — quote the design-tool variable beside each value, so a
+//    future session can diff against the source without guessing.
+// ========================================================================
+
+// ---------- Palette ----------
+@{{SLUG_SNAKE}}-ink:            #1a1a1a;   // TODO(design): set from the design system
+@{{SLUG_SNAKE}}-primary:        #1a1a1a;   // TODO(design): set from the design system
+@{{SLUG_SNAKE}}-accent:         #c2410c;   // TODO(design): set from the design system
+@{{SLUG_SNAKE}}-bg:             #ffffff;   // TODO(design): set from the design system
+@{{SLUG_SNAKE}}-bg-alt:         #f7f7f5;
+@{{SLUG_SNAKE}}-line:           #e5e5e5;
+@{{SLUG_SNAKE}}-text:           @{{SLUG_SNAKE}}-ink;
+@{{SLUG_SNAKE}}-text-muted:     #666666;
+
+// Derived states. NOTE: a near-black brand colour darkens poorly — on such a
+// palette, hover should LIGHTEN instead.
+@{{SLUG_SNAKE}}-primary-hover:  darken(@{{SLUG_SNAKE}}-primary, 8%);
+
+// ---------- Typography ----------
+// The FILES are loaded via Customizer → Theme → Style → Fonts (YOOtheme
+// self-hosts them). These stacks only NAME the families + fallbacks.
+// ⚠ A design tool may report optical-size CUTS as families ("Inter 18pt",
+// "Fraunces 72pt SuperSoft"). The CSS family name is the plain one.
+@{{SLUG_SNAKE}}-font-body:      "Inter", system-ui, -apple-system, sans-serif;
+@{{SLUG_SNAKE}}-font-display:   "Inter", Georgia, serif;
+
+// Desktop values. If the design ships no mobile scale, do NOT invent one —
+// treat these as the large-screen end and let UIkit's `-m` variables handle
+// smaller screens (section 2).
+@{{SLUG_SNAKE}}-t-h1:           48px;  // TODO(design): set from the design system
+@{{SLUG_SNAKE}}-t-h2:           36px;  // TODO(design)
+@{{SLUG_SNAKE}}-t-h3:           28px;  // TODO(design)
+@{{SLUG_SNAKE}}-t-h4:           20px;  // TODO(design)
+@{{SLUG_SNAKE}}-t-body:         16px;
+
+@{{SLUG_SNAKE}}-lh-tight:       1.1;
+@{{SLUG_SNAKE}}-lh-body:        1.5;
+
+// ---------- Spacing / radii / shadows ----------
+@{{SLUG_SNAKE}}-s-1:  4px;  @{{SLUG_SNAKE}}-s-2:  8px;  @{{SLUG_SNAKE}}-s-3: 12px;  @{{SLUG_SNAKE}}-s-4: 16px;
+@{{SLUG_SNAKE}}-s-6: 24px;  @{{SLUG_SNAKE}}-s-8: 32px;  @{{SLUG_SNAKE}}-s-12: 48px; @{{SLUG_SNAKE}}-s-16: 64px;
+
+@{{SLUG_SNAKE}}-r-sm: 4px;  @{{SLUG_SNAKE}}-r-md: 8px;  @{{SLUG_SNAKE}}-r-lg: 16px; @{{SLUG_SNAKE}}-r-pill: 999px;
+
+// Wrap in ~"..." so LESS emits them verbatim. Tinting with the brand colour
+// instead of pure black keeps elevation on-brand.
+@{{SLUG_SNAKE}}-shadow-sm: ~"0 1px 2px rgba(0, 0, 0, 0.05)";
+@{{SLUG_SNAKE}}-shadow-md: ~"0 4px 12px -2px rgba(0, 0, 0, 0.08)";
+
+// ---------- Layout ----------
+@{{SLUG_SNAKE}}-content-max: 1280px;
+@{{SLUG_SNAKE}}-gutter:      @{{SLUG_SNAKE}}-s-8;
+
+
+// ========================================================================
+// 2. MAP ONTO YOOtheme / UIkit VARIABLES
+//    This is the half that does the work — section 1 alone changes nothing.
+//    ⚠ VERIFY every name against the install before using it:
+//      grep -rn "^@button-primary-background:" \
+//        ../../yootheme/vendor/assets/uikit/src/less/components/button.less
+// ========================================================================
+
+// ---------- Global ----------
+@global-color:                @{{SLUG_SNAKE}}-text;
+@global-emphasis-color:       @{{SLUG_SNAKE}}-ink;
+@global-muted-color:          @{{SLUG_SNAKE}}-text-muted;
+@global-inverse-color:        @{{SLUG_SNAKE}}-bg;
+@global-background:           @{{SLUG_SNAKE}}-bg;
+@global-muted-background:     @{{SLUG_SNAKE}}-bg-alt;
+@global-primary-background:   @{{SLUG_SNAKE}}-primary;
+@global-secondary-background: @{{SLUG_SNAKE}}-accent;
+@global-border:               @{{SLUG_SNAKE}}-line;
+@global-border-width:         1px;
+@global-link-color:           @{{SLUG_SNAKE}}-accent;
+
+@global-font-family:          @{{SLUG_SNAKE}}-font-body;
+@global-font-size:            @{{SLUG_SNAKE}}-t-body;
+@global-line-height:          @{{SLUG_SNAKE}}-lh-body;
+@global-small-font-size:      14px;
+@global-medium-font-size:     @{{SLUG_SNAKE}}-t-h4;
+@global-large-font-size:      @{{SLUG_SNAKE}}-t-h3;
+@global-xlarge-font-size:     @{{SLUG_SNAKE}}-t-h2;
+@global-2xlarge-font-size:    @{{SLUG_SNAKE}}-t-h1;
+
+@global-margin:               @{{SLUG_SNAKE}}-s-6;
+@global-small-margin:         @{{SLUG_SNAKE}}-s-2;
+@global-medium-margin:        @{{SLUG_SNAKE}}-s-8;
+@global-large-margin:         @{{SLUG_SNAKE}}-s-16;
+@global-gutter:               @{{SLUG_SNAKE}}-gutter;
+@global-control-height:       48px;
+
+// ---------- Base + headings ----------
+// UIkit's `-m` pattern gives responsive headings for free: `-m` is the desktop
+// value, the bare one is for smaller screens (UIkit's default is `-m * 0.85`).
+@base-body-background:        @{{SLUG_SNAKE}}-bg;
+@base-body-font-family:       @{{SLUG_SNAKE}}-font-body;
+@base-heading-font-family:    @{{SLUG_SNAKE}}-font-display;
+@base-heading-color:          @{{SLUG_SNAKE}}-ink;
+@base-heading-text-transform: none;
+
+@base-h1-font-size-m:         @{{SLUG_SNAKE}}-t-h1;
+@base-h1-font-size:           @{{SLUG_SNAKE}}-t-h1 * 0.6;
+@base-h1-line-height:         @{{SLUG_SNAKE}}-lh-tight;
+@base-h2-font-size-m:         @{{SLUG_SNAKE}}-t-h2;
+@base-h2-font-size:           @{{SLUG_SNAKE}}-t-h2 * 0.65;
+@base-h3-font-size:           @{{SLUG_SNAKE}}-t-h3;
+@base-h4-font-size:           @{{SLUG_SNAKE}}-t-h4;
+
+// UIkit exposes no per-heading letter-spacing/weight variable, so these are
+// the rare RULES (not assignments) that belong here. Delete if not needed.
+// h1, .uk-h1 { font-weight: 300; letter-spacing: -0.03em; }
+
+// ---------- Buttons ----------
+// ⚠ The master theme forces uppercase + a small font size. Override if the
+// design says otherwise.
+@button-text-transform:             none;
+@button-font-size:                  @{{SLUG_SNAKE}}-t-body;
+@button-line-height:                @global-control-height;
+@button-padding-horizontal:         @{{SLUG_SNAKE}}-s-8;
+@button-primary-background:         @{{SLUG_SNAKE}}-primary;
+@button-primary-color:              @{{SLUG_SNAKE}}-bg;
+@button-primary-hover-background:   @{{SLUG_SNAKE}}-primary-hover;
+@button-default-background:         transparent;
+@button-default-color:              @{{SLUG_SNAKE}}-ink;
+@button-default-border:             @{{SLUG_SNAKE}}-ink;
+@button-default-hover-background:   @{{SLUG_SNAKE}}-ink;
+@button-default-hover-color:        @{{SLUG_SNAKE}}-bg;
+
+// UIkit has no global button-radius variable.
+.uk-button { border-radius: @{{SLUG_SNAKE}}-r-md; }
+
+// ---------- Cards / forms / navbar / containers ----------
+@card-default-background:      @{{SLUG_SNAKE}}-bg-alt;
+@card-body-padding-horizontal: @{{SLUG_SNAKE}}-s-8;
+@card-body-padding-vertical:   @{{SLUG_SNAKE}}-s-8;
+
+@form-background:              @{{SLUG_SNAKE}}-bg-alt;
+@form-border:                  @{{SLUG_SNAKE}}-line;
+@form-focus-border:            @{{SLUG_SNAKE}}-primary;
+@form-height:                  @global-control-height;
+
+@navbar-background:                transparent;
+@navbar-nav-item-font-size:        @{{SLUG_SNAKE}}-t-body;
+@navbar-nav-item-text-transform:   none;
+@navbar-nav-item-color:            @{{SLUG_SNAKE}}-ink;
+@navbar-nav-item-hover-color:      @{{SLUG_SNAKE}}-accent;
+
+@container-max-width:          @{{SLUG_SNAKE}}-content-max;
+
+// ---------- Inverse (dark sections) ----------
+// Drives every element inside a section set to a dark background.
+@inverse-global-color:            fade(@{{SLUG_SNAKE}}-bg, 80%);
+@inverse-global-emphasis-color:   @{{SLUG_SNAKE}}-bg;
+@inverse-global-muted-color:      fade(@{{SLUG_SNAKE}}-bg, 60%);
+@inverse-global-inverse-color:    @{{SLUG_SNAKE}}-ink;
+@inverse-global-border:           fade(@{{SLUG_SNAKE}}-bg, 20%);
+@inverse-base-heading-color:      @{{SLUG_SNAKE}}-bg;
+
+
+// ========================================================================
+// 3. EMIT CUSTOM PROPERTIES (optional but recommended)
+//    LESS variables are compile-time only. Re-emitting them lets builder
+//    Custom CSS, page JS and later section work share one vocabulary.
+// ========================================================================
+
+:root {
+    --{{SLUG}}-ink:          @{{SLUG_SNAKE}}-ink;
+    --{{SLUG}}-primary:      @{{SLUG_SNAKE}}-primary;
+    --{{SLUG}}-accent:       @{{SLUG_SNAKE}}-accent;
+    --{{SLUG}}-bg:           @{{SLUG_SNAKE}}-bg;
+    --{{SLUG}}-text:         @{{SLUG_SNAKE}}-text;
+    --{{SLUG}}-text-muted:   @{{SLUG_SNAKE}}-text-muted;
+    --{{SLUG}}-line:         @{{SLUG_SNAKE}}-line;
+    --{{SLUG}}-font-body:    @{{SLUG_SNAKE}}-font-body;
+    --{{SLUG}}-font-display: @{{SLUG_SNAKE}}-font-display;
+    --{{SLUG}}-s-4:          @{{SLUG_SNAKE}}-s-4;
+    --{{SLUG}}-s-8:          @{{SLUG_SNAKE}}-s-8;
+    --{{SLUG}}-r-md:         @{{SLUG_SNAKE}}-r-md;
+    --{{SLUG}}-shadow-md:    @{{SLUG_SNAKE}}-shadow-md;
+    --{{SLUG}}-content-max:  @{{SLUG_SNAKE}}-content-max;
+}
