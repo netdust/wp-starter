@@ -38,6 +38,13 @@ parameters:
     excludePaths:
         # Composer-installed stock theme — not our code (constant name, portability-safe)
         - {{GATE_CONTENT_DIR}}/themes/twentytwentyfive (?)
+        # YOOtheme Pro parent — LICENSED VENDOR CODE, not ours (~41MB). Without
+        # this, analysis walks the whole parent and reports 1000+ errors from
+        # its own vendor packages (WooCommerce listeners, GD driver, ...), which
+        # is a red gate on a freshly scaffolded YOOtheme site. Harmless on a
+        # non-YOOtheme site: the path simply does not exist, and the `(?)`
+        # suffix makes a missing path non-fatal.
+        - {{GATE_CONTENT_DIR}}/themes/yootheme (?)
         # Theme build artifacts / JS dependencies — never analysed.
         # Trailing /* is required: wildcard excludePaths are fnmatch'd against
         # FILE paths, so a bare .../node_modules pattern never matches the files
