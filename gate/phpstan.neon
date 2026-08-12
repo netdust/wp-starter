@@ -1,11 +1,13 @@
 includes:
     - vendor/szepeviktor/phpstan-wordpress/extension.neon
-    # Pre-existing findings in the vendored framework + theme, frozen at gate
-    # introduction. New code must be clean; do not add to this file.
-    # Coupling: the baseline references {{GATE_CONTENT_DIR}}/mu-plugins/ntdst-core + the theme —
-    # both live in THIS repo (netdust/wp-starter) and are rendered into a
-    # project by scaffold_wp_starter; regenerate with --generate-baseline
-    # after changing the vendored framework or theme.
+    # Pre-existing findings in the theme, frozen at gate introduction. New
+    # code must be clean; do not add to this file. netdust/ntdst-core and
+    # netdust/ntdst-baseline are composer packages (their own repo, gate,
+    # reviewers) and are excluded wholesale below — never baselined here.
+    # Coupling: the baseline references the theme, which lives in THIS repo
+    # (netdust/wp-starter) and is rendered into a project by
+    # scaffold_wp_starter; regenerate with --generate-baseline after
+    # changing the theme.
     - phpstan-baseline.neon
 
 parameters:
@@ -51,3 +53,14 @@ parameters:
         # beneath it (surfaced by flatted/php/flatted.php inside npm deps).
         - {{GATE_CONTENT_DIR}}/themes/*/node_modules/* (?)
         - {{GATE_CONTENT_DIR}}/themes/*/dist/* (?)
+        # netdust/ntdst-core is a composer package with its own repo, gate,
+        # and reviewers (github.com/netdust/ntdst-core) — only OUR code is
+        # analysed here (ruling 2026-08-12, same posture as vendor/). The
+        # `(?)` suffix makes a missing path non-fatal — harmless before the
+        # first `composer update` installs it.
+        - {{GATE_CONTENT_DIR}}/mu-plugins/ntdst-core/* (?)
+        # netdust/ntdst-baseline is a composer package with its own repo,
+        # gate, and reviewers (github.com/netdust/ntdst-baseline) — only OUR
+        # code is analysed here (ruling 2026-08-12). Same posture as
+        # ntdst-core above.
+        - {{GATE_CONTENT_DIR}}/mu-plugins/ntdst-baseline/* (?)

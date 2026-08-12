@@ -17,6 +17,12 @@
     <!-- Third-party / not our code (applies when wider paths are passed manually) -->
     <exclude-pattern>*/{{GATE_CONTENT_DIR}}/themes/twentytwentyfive/*</exclude-pattern>
     <exclude-pattern>*/{{GATE_CONTENT_DIR}}/mu-plugins/bedrock-disallow-indexing/*</exclude-pattern>
+    <!-- netdust/ntdst-core + netdust/ntdst-baseline are composer packages with
+         their own repo, gate, and reviewers (github.com/netdust/ntdst-core,
+         github.com/netdust/ntdst-baseline) — only OUR code is scanned here
+         (ruling 2026-08-12), same posture as vendor/ below. -->
+    <exclude-pattern>*/{{GATE_CONTENT_DIR}}/mu-plugins/ntdst-core/*</exclude-pattern>
+    <exclude-pattern>*/{{GATE_CONTENT_DIR}}/mu-plugins/ntdst-baseline/*</exclude-pattern>
     <exclude-pattern>*/vendor/*</exclude-pattern>
     <exclude-pattern>*/{{GATE_WP_DIR}}/*</exclude-pattern>
     <exclude-pattern>*/node_modules/*</exclude-pattern>
