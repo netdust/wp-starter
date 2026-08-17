@@ -56,9 +56,10 @@ void them quietly. They ARE the pack's trust claim:
 `spec-gate.py` refuses a plan whose `tasks.md` lacks the named review
 scopes: one task carrying `review: security`, one carrying
 `review: code`. Their build-time check is
-`vendor/netdust/flow/bin/review-check.py <feature-dir> <scope>` run
-through `attest.py`; the report needs `VERDICT: CLEAN`, the exact
-`tree:` hash, and a `reviewer:` identity line. Dispatch reviews to a
+`vendor/netdust/flow/bin/review-check.py <feature-dir> <scope> --not implementer`
+run through `attest.py`; the report needs `VERDICT: CLEAN`, the exact
+`tree:` hash, and a `reviewer:` identity line that is NOT the
+builder's (`--not` refuses it mechanically). Dispatch reviews to a
 fresh-context subagent (see `craft/site-builder.md` § Dispatching the
 review cluster) — never review your own work to green them.
 

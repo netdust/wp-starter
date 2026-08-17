@@ -8,7 +8,7 @@
     {
       "id": "brief",
       "kind": "agent",
-      "actor": "site-builder",
+      "actor": "planner",
       "craft": [
         ".flow/craft/site-builder.md"
       ],
@@ -24,7 +24,7 @@
     {
       "id": "plan",
       "kind": "agent",
-      "actor": "site-builder",
+      "actor": "planner",
       "craft": [
         ".flow/craft/site-builder.md"
       ],
@@ -44,6 +44,7 @@
     {
       "id": "approve-plan",
       "kind": "human",
+      "actor": "owner",
       "out": [
         "seal approve-plan"
       ]
@@ -56,7 +57,7 @@
     {
       "id": "build",
       "kind": "agent",
-      "actor": "site-builder",
+      "actor": "implementer",
       "craft": [
         ".flow/craft/site-builder.md",
         ".flow/craft/wp-reviewer.md"
@@ -77,6 +78,7 @@
     {
       "id": "unblock",
       "kind": "human",
+      "actor": "owner",
       "out": [
         "resolved task"
       ]
@@ -104,6 +106,7 @@
     {
       "id": "shakeout",
       "kind": "human",
+      "actor": "owner",
       "craft": [
         ".flow/craft/site-builder.md"
       ],

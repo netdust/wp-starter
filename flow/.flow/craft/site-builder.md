@@ -79,7 +79,9 @@ not, the check is theater.
 The plan gate refused any `tasks.md` without the named review scopes
 (I5) — one task carrying `review: security`, one carrying
 `review: code` — so the ledger contains them: tasks whose check is
-`review-check.py <feature-dir> <scope>` run through `attest.py`. Do not
+`review-check.py <feature-dir> <scope> --not implementer` run through
+`attest.py` — the `--not` makes "the reviewer is not the builder" a
+machine check: a report signed `implementer` is refused. Do not
 review your own work to green them. Dispatch a **fresh-context
 subagent** with `wp-reviewer.md` as its brief — when the netdust-agent
 plugin is installed, use its reviewer personas (`reviewer`,
