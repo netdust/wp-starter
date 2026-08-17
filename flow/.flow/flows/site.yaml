@@ -29,7 +29,7 @@ state:
 nodes:
   - id: brief             # what the site is FOR: audience, pages,
     kind: agent           # content sources, constraints, the brand
-    actor: site-builder
+    actor: planner
     craft: [.flow/craft/site-builder.md]
     out: [spec.md]
 
@@ -39,7 +39,7 @@ nodes:
 
   - id: plan
     kind: agent
-    actor: site-builder
+    actor: planner
     craft: [.flow/craft/site-builder.md]
     in: [spec.md]
     out: [plan.md, tasks.md]
@@ -50,6 +50,7 @@ nodes:
 
   - id: approve-plan      # yield point only — the decision is the seal.
     kind: human           # A site is scope, budget and a client
+    actor: owner
     out: [seal approve-plan]   # promise; it gets approved before code.
 
   - id: gate-approval
@@ -58,8 +59,8 @@ nodes:
 
   - id: build             # the loop body: one task, its check, its
     kind: agent           # attest. Reviews are ledger tasks (I5) —
-    actor: site-builder   # dispatched to a DIFFERENT actor, per the
-    craft:                # craft's dispatch contract.
+    actor: implementer    # their checks run --not implementer, so the
+    craft:                # builder cannot sign its own review.
       - .flow/craft/site-builder.md
       - .flow/craft/wp-reviewer.md
     in: [tasks.md]
@@ -72,6 +73,7 @@ nodes:
 
   - id: unblock
     kind: human
+    actor: owner
     out: [resolved task]
 
   # ── the machine gates, cheapest first ───────────────────────────────
@@ -98,6 +100,7 @@ nodes:
 
   - id: shakeout          # THE HUMAN PART. Everything above is green,
     kind: human           # so this is about whether it looks right —
+    actor: owner
     craft: [.flow/craft/site-builder.md]
     out: [seal shakeout]
 
