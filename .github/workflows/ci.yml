@@ -1,0 +1,78 @@
+name: ci
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  flow-pack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # The payload's flow is linted by the runtime that will drive it.
+      - uses: actions/checkout@v4
+        with:
+          repository: netdust/netdust-flow
+          path: .netdust-flow
+      - run: pip install -r .netdust-flow/requirements-dev.txt
+
+      # No untokenized layout literals anywhere in the payloads.
+      - name: token lint
+        run: sh gate/bin/lint-tokens.sh
+
+      # The gates are code. A security gate nobody tested reports clean
+      # because its regex never matched anything.
+      - name: gate fixtures + graph shape
+        run: python flow/.flow/tests/pack-tests.py
+
+      # The flow must lint and keep its twin in sync — a stale twin is
+      # what actually drives the run.
+      - name: flow lints, twin is fresh
+        run: |
+          python .netdust-flow/bin/flow-lint.py flow/.flow/flows/site.yaml --compile
+          git diff --exit-code -- flow/.flow/flows/ \
+            || { echo "::error::site.json is stale — recompile with flow-lint --compile"; exit 1; }
+
+      # Prove the payloads COMPOSE: render flow/ + gate/ into a fake
+      # project root the way scaffold_wp_starter would, then ask the
+      # lint whether every gate program and every craft file the flow
+      # names actually resolves there. `bin/gate.sh` comes from gate/,
+      # everything else from flow/ — a payload split that drifted apart
+      # fails here, not on a client site.
+      - name: gates resolve on a simulated render
+        run: |
+          RENDER=$(mktemp -d)
+          cp -R flow/. gate/. "$RENDER"/
+          find "$RENDER" -type f -not -path "*/node_modules/*" \
+            -exec sed -i 's/{{SLUG}}/ci-slug/g' {} +
+          python .netdust-flow/bin/flow-lint.py "$RENDER/.flow/flows/site.yaml" \
+            --check-gates --check-craft --project "$RENDER" \
+            --bind netdust_flow=$GITHUB_WORKSPACE/.netdust-flow \
+            --bind theme=ci-slug --bind base_ref=main
+
+      - name: shell gates are valid bash
+        run: |
+          for f in flow/.flow/bin/*.sh gate/bin/*.sh; do bash -n "$f" || exit 1; done
+
+  flow-php:
+    # The security gate reasons about PHP, so prove its fixtures are PHP
+    # the interpreter actually accepts. A fixture with a syntax error
+    # would test the scanner against something no one can write.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: fixtures are syntactically valid PHP
+        run: python flow/.flow/tests/fixture-syntax.py
