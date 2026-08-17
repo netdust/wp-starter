@@ -170,6 +170,18 @@ degrades to an ordinary unharnessed session (arming is impossible
 without the runtime — `flow-arm.py` IS the runtime), never to a
 fake-harnessed one.
 
+**Where netdust-agent fits.** The graph deliberately names only
+pack-local craft, so a site never hard-depends on a personal plugin
+install (arm-time craft checks would refuse on a machine without it).
+The plugin participates at run time instead: its intake router routes
+delivery work into `/flow`, its skills are ambient while the driving
+session works the build node, and the I5 review cluster the plan gate
+forces into `tasks.md` is executed by dispatching its reviewer
+personas with `.flow/craft/wp-reviewer.md` as the brief (see
+`site-builder.md` § Dispatching the review cluster). Without the
+plugin, the road still runs — any fresh-context agent can carry the
+reviewer brief.
+
 **Per site, before the first run:** edit `.flow/render-routes.txt`
 (every URL that must render — an unlisted route is a route nothing
 checks) and tune `.flow/floors.yaml` to the codebase. Then arm:

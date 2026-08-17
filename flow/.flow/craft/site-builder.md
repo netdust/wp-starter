@@ -8,9 +8,10 @@ stolen from the part only they can do.
 
 ## Write for the gates you will meet
 
-You know the road: syntax → security → standards → render → a11y →
-their eyes. Writing to clear those on the first pass is not
-gate-pleasing, it is just the job.
+You know the road: security scan → the gate umbrella (`bin/gate.sh`:
+lint, analyse, deps audit, unit/js/integration/e2e tests, build
+check) → render → a11y → their eyes. Writing to clear those on the
+first pass is not gate-pleasing, it is just the job.
 
 **Escaping — late and always.** Escape at output, in the form that
 matches the context: `esc_html()` in text, `esc_attr()` in attributes,
@@ -72,6 +73,22 @@ work.
 
 Before attesting: **if I reverted this, would the check go red?** If
 not, the check is theater.
+
+## Dispatching the review cluster
+
+The plan gate refused any `tasks.md` without review tasks (I5), so the
+ledger contains them: tasks whose check is
+`review-check.py <feature-dir> <name>` run through `attest.py`. Do not
+review your own work to green them. Dispatch a **fresh-context
+subagent** with `wp-reviewer.md` as its brief — when the netdust-agent
+plugin is installed, use its reviewer personas (`reviewer`,
+`security-sentinel`, `code-simplicity-reviewer`) carrying that brief;
+without the plugin, any fresh-context agent holding only
+`wp-reviewer.md` and the diff. What makes the review evidence is not
+who ran it but that the reviewer is not you, the verdict is written to
+`reviews/<name>.md` bound to the exact tree, and `review-check.py`
+signed off through the attest — a review of yesterday's tree proves
+nothing about today's.
 
 ## What belongs to the human
 
