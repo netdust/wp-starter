@@ -30,8 +30,17 @@ test.describe('smoke', () => {
     await page.goto('/');
     // Structural, not content-coupled (I6): a visible page header and a
     // navigation landmark — true for any sanely-built theme.
-    await expect(page.locator('header').first()).toBeVisible();
-    await expect(page.getByRole('navigation').first()).toBeVisible();
+    //
+    // `.first()` is wrong on a responsive theme that ships a breakpoint PAIR.
+    // The yootheme preset does: YOOtheme renders BOTH
+    // `header.tm-header-mobile.uk-hidden@m` and `header.tm-header.uk-visible@m`,
+    // so the first match in DOM order is the one hidden at the current
+    // viewport and the assertion fails on a perfectly good page. Assert that
+    // SOME header/nav is visible instead — same structural intent, no coupling
+    // to which breakpoint happens to be active. Matters because most Netdust
+    // sites use the yootheme preset.
+    await expect(page.locator('header').filter({ visible: true }).first()).toBeVisible();
+    await expect(page.getByRole('navigation').filter({ visible: true }).first()).toBeVisible();
   });
 
   test('e2e-admin can log in at /wp/wp-login.php and reach the dashboard', async ({ page }) => {
