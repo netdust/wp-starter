@@ -17,8 +17,10 @@ Write `<feature-dir>/reviews/<name>.md`:
 
 ## Look where the gates cannot
 
-The five machine gates cover syntax, the four security patterns,
-WPCS, rendering, and a11y basics. So spend your attention here:
+The machine gates cover the four security patterns, the project's
+whole quality umbrella (lint, static analysis, unit/js/integration/e2e
+tests, build), rendering, and a11y basics. So spend your attention
+here:
 
 **Escaping the gate accepted but the context breaks.** `esc_attr()` on a
 value that lands inside a `<script>` block. `esc_html()` on something
