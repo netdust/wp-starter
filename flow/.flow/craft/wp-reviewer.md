@@ -8,6 +8,7 @@ Write `<feature-dir>/reviews/<name>.md`:
 
     VERDICT: CLEAN | FINDINGS
     tree: <git rev-parse HEAD^{tree}>
+    reviewer: <who you are — persona name or agent identity>
 
     ## Findings
     ### F1 — <the defect in one line>
@@ -71,3 +72,7 @@ take the fix with it.
 - **Bind the tree.** `git rev-parse HEAD^{tree}`, pasted verbatim. A
   review of yesterday's theme proves nothing about today's, and
   `review-check.py` will say so.
+- **Sign the record.** The `reviewer:` line is required — the run
+  record must answer WHO reviewed, not just that a review exists. It
+  is a recorded claim on the audit trail: writing someone else's name
+  there is a forged record, not a formality.
