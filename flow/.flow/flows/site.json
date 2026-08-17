@@ -8,6 +8,7 @@
     {
       "id": "brief",
       "kind": "agent",
+      "actor": "site-builder",
       "craft": [
         ".flow/craft/site-builder.md"
       ],
@@ -23,6 +24,7 @@
     {
       "id": "plan",
       "kind": "agent",
+      "actor": "site-builder",
       "craft": [
         ".flow/craft/site-builder.md"
       ],
@@ -54,6 +56,7 @@
     {
       "id": "build",
       "kind": "agent",
+      "actor": "site-builder",
       "craft": [
         ".flow/craft/site-builder.md",
         ".flow/craft/wp-reviewer.md"

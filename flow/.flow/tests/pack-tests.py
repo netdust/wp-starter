@@ -166,6 +166,62 @@ function t() {
 """, {"CAPS"})
 
 
+# ── the plan gate: I5 by named scope ─────────────────────────────────
+SPEC_OK = """## Problem
+x
+## Requirements
+- R1 a
+- R2 b
+- R3 c
+## Acceptance
+x
+"""
+
+def spec_gate(tasks_body: str) -> tuple[int, str]:
+    """Run spec-gate.py against a minimal valid spec/plan and the given
+    tasks.md — isolating the review-cluster rule."""
+    with tempfile.TemporaryDirectory() as td:
+        fd = Path(td) / "feature"
+        fd.mkdir()
+        (fd / "spec.md").write_text(SPEC_OK)
+        (fd / "plan.md").write_text(
+            "## Tasks\nT01 T02 T03\nLoop budget: ~10\n")
+        (fd / "tasks.md").write_text(tasks_body)
+        p = subprocess.run(
+            [sys.executable, str(FLOW / "bin" / "spec-gate.py"), str(fd)],
+            capture_output=True, text=True)
+        return p.returncode, p.stdout
+
+
+def expect_gate(name: str, tasks_body: str, clean: bool) -> None:
+    global checks
+    checks += 1
+    rc, out = spec_gate(tasks_body)
+    if clean and rc != 0:
+        failures.append(f"{name}: expected clean, got\n    {out.strip()}")
+    if not clean and rc == 0:
+        failures.append(f"{name}: expected refusal, gate passed")
+
+
+expect_gate("named review scopes satisfy I5",
+            "- [ ] T01 build the thing\n"
+            "- [ ] T02 review: security — dispatch per craft, check "
+            "review-check.py\n"
+            "- [ ] T03 review: code — dispatch per craft, check "
+            "review-check.py\n", clean=True)
+
+expect_gate("a vague review task is refused",
+            "- [ ] T01 build the thing\n"
+            "- [ ] T02 review the code\n", clean=False)
+
+expect_gate("one named scope alone is refused",
+            "- [ ] T01 build the thing\n"
+            "- [ ] T02 review: security\n", clean=False)
+
+expect_gate("no review cluster at all is refused",
+            "- [ ] T01 build the thing\n", clean=False)
+
+
 # ── the flow itself ──────────────────────────────────────────────────
 def check_flow() -> None:
     """Whatever else changes, these must hold: no machine gate may route

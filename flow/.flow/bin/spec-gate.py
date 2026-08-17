@@ -19,9 +19,16 @@ task did not happen (run 0001, finding F4).
               ## Acceptance sections, and at least 3 requirement lines.
   plan stage  (only once plan.md exists) plan.md carries ## Tasks and
               a `Loop budget:` line; tasks.md exists with `- [ ] Tnn`
-              lines, each Tnn also named in plan.md; AND at least one
-              task line contains the word "review" (I5 — the review
-              cluster, attested like any other task).
+              lines, each Tnn also named in plan.md; AND the review
+              cluster is present BY NAMED SCOPE (I5): one task line
+              carrying `review: security` and one carrying
+              `review: code`. A vague "review it" task satisfies a
+              word-match and nothing else; naming the scopes makes
+              WHAT must be independently reviewed a protocol
+              property, while WHO reviews stays free (the craft's
+              dispatch contract). Each scope's check at build time is
+              `review-check.py <feature-dir> <scope>` through
+              attest.py.
 
 Exit 0 clean · 1 findings (FAIL lines on stdout).
 """
@@ -70,9 +77,14 @@ def main() -> int:
             for _, tid, _ in matches:
                 if tid not in ptext:
                     fails.append(f"{tid} in tasks.md but not named in plan.md")
-            if not any("review" in rest.lower() for _, _, rest in matches):
-                fails.append("no review cluster in tasks.md (I5: a review "
-                             "that is not a ledger task did not happen)")
+            rests = [rest.lower() for _, _, rest in matches]
+            for scope in ("security", "code"):
+                if not any(f"review: {scope}" in r for r in rests):
+                    fails.append(
+                        f"no `review: {scope}` task in tasks.md (I5: the "
+                        "review cluster is named by scope — a review that "
+                        "is not a ledger task did not happen, and a vague "
+                        "review task reviews nothing in particular)")
 
     for f in fails:
         print(f"FAIL  [spec-gate]  {f}")

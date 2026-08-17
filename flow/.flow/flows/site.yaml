@@ -29,6 +29,7 @@ state:
 nodes:
   - id: brief             # what the site is FOR: audience, pages,
     kind: agent           # content sources, constraints, the brand
+    actor: site-builder
     craft: [.flow/craft/site-builder.md]
     out: [spec.md]
 
@@ -38,6 +39,7 @@ nodes:
 
   - id: plan
     kind: agent
+    actor: site-builder
     craft: [.flow/craft/site-builder.md]
     in: [spec.md]
     out: [plan.md, tasks.md]
@@ -55,8 +57,9 @@ nodes:
     run: "{netdust_flow}/bin/seal.py check {feature_dir} approve-plan"
 
   - id: build             # the loop body: one task, its check, its
-    kind: agent           # attest. Reviews are ledger tasks (I5).
-    craft:
+    kind: agent           # attest. Reviews are ledger tasks (I5) —
+    actor: site-builder   # dispatched to a DIFFERENT actor, per the
+    craft:                # craft's dispatch contract.
       - .flow/craft/site-builder.md
       - .flow/craft/wp-reviewer.md
     in: [tasks.md]
