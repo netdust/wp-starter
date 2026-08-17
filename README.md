@@ -22,6 +22,13 @@ regardless of stack (bedrock | stackwp):
   `.ddev/` gate additions),
   copied to the project root then rendered with the gate tokens (absorbed from
   `netdust/bedrock` in T02 of `specs/new-site-stack-choice`)
+- **flow layer** — `flow/` mirrors the project root (`.flow/` delivery road +
+  gates + floors, `.claude/settings.json` hook wiring), copied to the project
+  root then rendered with `{{SLUG}}`. The runtime it drives is
+  `netdust/flow`, a **composer package** consumed exactly like `ntdst-core`
+  (see "Flow layer" below); the payload commits only the road, the
+  WordPress-shaped gates, and two thin hook shims that exec the
+  composer-installed kernel (absorbed from `netdust/WordPress-site-pack`).
 
 ```
 wp-starter/
@@ -30,7 +37,8 @@ wp-starter/
 │   └── ntdst-baselineloader.php   ← copied verbatim; requires the composer-installed package
 ├── theme/                     ← preset `plain`  → themes/<slug>/, then tokens rendered
 ├── theme-yootheme/            ← preset `yootheme` → same, but a YOOtheme CHILD
-└── gate/                      ← copied to the project ROOT (merge .ddev/), then gate tokens rendered
+├── gate/                      ← copied to the project ROOT (merge .ddev/), then gate tokens rendered
+└── flow/                      ← copied to the project ROOT (.flow/ + .claude/), {{SLUG}} rendered
 ```
 
 Neither `ntdst-core/` nor `ntdst-baseline/` directories exist in this repo —
@@ -120,6 +128,64 @@ project already gives `vendor/`:
 `ntdst-baseline` when a feature is actually asked for by a named consumer.
 Neither repo may be bloated — they are minimal WordPress layers: solid,
 secure code, features enter only with a named consumer.
+
+## Flow layer
+
+The `flow/` payload gives every scaffolded site the netdust-flow
+delivery road:
+
+    __start__ → brief ⊨gate → plan ⊨gate → YOUR APPROVAL ⊨seal
+              → build ⟲ ledger
+              → security scan → gate umbrella (bin/gate.sh) → render → a11y
+              → YOUR SHAKE-OUT ⊨seal(--fresh) → __end__
+
+Two human stops, recorded as seals. Everything between them is exit
+codes. The check battery is the starter's own `gate/` umbrella; the
+flow adds the road around it, the WordPress-shaped scans the umbrella
+lacks (security heuristics, real-render, a11y), and the rule that
+`__end__` is reachable only through your recorded, still-fresh seal.
+
+**Runtime via composer.** The kernel (walker, Stop hook, evidence
+stores, lint) is `netdust/flow` — consumed exactly like `ntdst-core`:
+
+```json
+"repositories": [
+    { "type": "vcs", "url": "git@github.com:netdust/netdust-flow.git" }
+],
+"require-dev": {
+    "netdust/flow": "^0.1"
+}
+```
+
+`scaffold_wp_starter` injects this alongside the framework entries.
+`composer.lock` pins the exact runtime revision, so a runtime update is
+a reviewed lockfile diff — never a silent change to what "finished"
+means for a live site.
+
+**What is committed vs installed.** The site commits `.flow/` (road,
+gates, floors, render-routes, craft, tests) and two thin hook shims in
+`.flow/hooks/` wired by `.claude/settings.json`; the shims exec the
+composer-installed kernel. A clone that skipped `composer install`
+degrades to an ordinary unharnessed session (arming is impossible
+without the runtime — `flow-arm.py` IS the runtime), never to a
+fake-harnessed one.
+
+**Per site, before the first run:** edit `.flow/render-routes.txt`
+(every URL that must render — an unlisted route is a route nothing
+checks) and tune `.flow/floors.yaml` to the codebase. Then arm:
+
+    /flow build/<feature> site
+
+**Verify the payload** after editing it here:
+
+    python3 <netdust-flow>/bin/flow-lint.py flow/.flow/flows/site.yaml --compile
+    python3 flow/.flow/tests/pack-tests.py     # gate fixtures + graph shape
+    python3 flow/.flow/tests/fixture-syntax.py # fixtures must parse (php -l)
+
+`pack-tests.py` asserts the pack's entire trust claim: no machine gate
+routes a red exit anywhere but back to `build`, `__end__` is reachable
+only through the seal gate, and the finishing seal is `--fresh`. An
+edge added later must not be able to void that quietly.
 
 ## Token vocabulary
 

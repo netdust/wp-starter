@@ -1,0 +1,36 @@
+# .flow/pack.yaml — the WordPress site delivery pack (wp-starter edition).
+pack: wordpress-site
+description: >
+  Build a WordPress site through gates: security heuristics, the
+  starter's own quality umbrella (lint, analyse, deps audit, unit/js/
+  integration/e2e tests, build check), real-browser render,
+  accessibility — then a human seal on the only question a machine
+  cannot answer. Scaffolded by netdust/wp-starter; runtime installed
+  by composer as netdust/flow.
+
+flows:
+  site: flows/site.yaml
+
+binds:
+  netdust_flow:
+    description: >
+      the netdust-flow runtime root. Arming with
+      `python3 vendor/netdust/flow/bin/flow-arm.py` resolves this
+      automatically to the composer-installed copy; no value needed.
+    example: "vendor/netdust/flow"
+  theme:
+    description: the theme slug wp-render.sh activates before requesting routes
+    value: "{{SLUG}}"
+  base_ref:
+    description: the ref the security scan diffs against
+    value: "main"
+
+requires:
+  - {name: php,      why: "gate-suite tiers (phpcs, phpstan, phpunit) run on the host PHP"}
+  - {name: composer, why: "gate-suite (bin/gate.sh drives composer run-script tiers) and the netdust/flow runtime itself"}
+  - {name: ddev,     why: "gate-suite test:int hop, gate-render, gate-a11y — booting real WordPress"}
+  - {name: npx,      why: "gate-a11y and gate-suite test:e2e (Playwright)"}
+
+# Every one of these is required, not optional. A gate whose tool is
+# missing FAILS — it does not skip. See bin/tool.sh for why: a gate that
+# passes when it could not run makes green mean nothing.

@@ -1,0 +1,25 @@
+{
+    "hooks": {
+        "PreToolUse": [
+            {
+                "matcher": "Bash|Write|Edit|NotebookEdit",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python3 .flow/hooks/pretooluse-guard.py"
+                    }
+                ]
+            }
+        ],
+        "Stop": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python3 .flow/hooks/loop-gate.py"
+                    }
+                ]
+            }
+        ]
+    }
+}
