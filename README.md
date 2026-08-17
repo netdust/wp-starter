@@ -182,6 +182,12 @@ personas with `.flow/craft/wp-reviewer.md` as the brief (see
 plugin, the road still runs — any fresh-context agent can carry the
 reviewer brief.
 
+**For agents (and humans) changing the road:** the payload ships
+`.flow/README.md` — the editing checklist (yaml → compile → pack-tests
+→ commit both), the three shape rules every edit must keep, and how to
+add a gate. It rides the scaffold into every site so a fresh session
+learns the workflow by reading, not by refusal.
+
 **Per site, before the first run:** edit `.flow/render-routes.txt`
 (every URL that must render — an unlisted route is a route nothing
 checks) and tune `.flow/floors.yaml` to the codebase. Then arm:
