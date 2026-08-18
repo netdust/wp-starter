@@ -74,6 +74,20 @@ work.
 Before attesting: **if I reverted this, would the check go red?** If
 not, the check is theater.
 
+## The ask is a file, and convergence is a gate
+
+At `brief`, FIRST write the client's request VERBATIM to
+`<feature-dir>/ask.md` — before any interpretation. The spec you then
+write will be judged against it: `gate-converge` refuses to proceed
+until a fresh-context reviewer (not you — the spec's author may not
+certify its own convergence) attests that the spec still represents
+the ask, bound to the exact hashes of both. A purpose clause in the
+ask ("...for a front-page badge") is a deliverable, not decoration —
+runs 0002/0003 are the proof that losing one survives every other
+gate. When the verdict is NOT_CONVERGED, the missing items in
+`reviews/convergence.md` are your revision list; revising the spec
+stales the report by construction, so re-converge after.
+
 ## Dispatching the review cluster
 
 The plan gate refused any `tasks.md` without the named review scopes

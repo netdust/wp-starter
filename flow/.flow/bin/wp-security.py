@@ -266,10 +266,20 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("paths", nargs="*", default=list(DEFAULT_ROOTS))
     ap.add_argument("--base", help="scan only files changed against this ref")
+    ap.add_argument("--require-scope", action="store_true",
+                    help="FAIL when the scope is empty — a diff-scoped gate "
+                         "scanning nothing is a misconfiguration (base_ref "
+                         "equal to the working branch), not a clean scan "
+                         "(runs 0002/0003, F7)")
     args = ap.parse_args()
 
     files = php_files(args.paths or list(DEFAULT_ROOTS), args.base)
     if not files:
+        if args.require_scope:
+            print("FAIL  [wp-security]  empty scope with --require-scope — "
+                  "nothing was scanned; check base_ref (equal to the current "
+                  "branch makes the diff vacuous)")
+            return 1
         print("ok    [wp-security]  no PHP files in scope")
         return 0
 
