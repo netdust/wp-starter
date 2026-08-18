@@ -63,6 +63,23 @@ builder's (`--not` refuses it mechanically). Dispatch reviews to a
 fresh-context subagent (see `craft/site-builder.md` § Dispatching the
 review cluster) — never review your own work to green them.
 
+## Convergence (I7)
+
+`gate-converge` sits between the plan gate and your approval: a
+fresh-context reviewer (never the planner) judges whether spec.md
+still represents `ask.md` — the request captured verbatim at brief —
+and the verdict is verified by
+`vendor/netdust/flow/bin/converge-check.py` against sha256(ask) +
+sha256(spec) + tree. NOT_CONVERGED routes back to plan with the
+missing items. Do not weaken this to a word-match: it exists because
+a dropped deliverable survives every other gate (runs 0002/0003).
+
+## Replays
+
+Re-arming over pre-existing paperwork trips the dry-loop guardrail
+(no checkbox movement across stops = disarm). Deliberate replays arm
+with `--max-dry` headroom.
+
 ## Never
 
 - Edit `flows/site.json`, the run journal, or the marker by hand.

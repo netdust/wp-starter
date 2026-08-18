@@ -28,10 +28,10 @@ state:
 
 nodes:
   - id: brief             # what the site is FOR: audience, pages,
-    kind: agent           # content sources, constraints, the brand
-    actor: planner
+    kind: agent           # content sources, constraints, the brand —
+    actor: planner        # FIRST capture the ask verbatim as ask.md,
     craft: [.flow/craft/site-builder.md]
-    out: [spec.md]
+    out: [ask.md, spec.md]
 
   - id: gate-brief        # structure + acceptance criteria + the review
     kind: gate            # cluster (I5) — refuses a plan without one
@@ -47,6 +47,16 @@ nodes:
   - id: gate-plan
     kind: gate
     run: ".flow/bin/spec-gate.py {feature_dir}"
+
+  - id: gate-converge     # I7: does the spec still represent the
+    kind: gate            # ORIGINAL ask (ask.md)? Verifies an attested
+                          # fresh-context convergence review bound to
+                          # sha256(ask)+sha256(spec)+tree; the spec's
+                          # author may not certify its own convergence.
+                          # Proven by runs 0002/0003: without this gate
+                          # the road finished green around a dropped
+                          # deliverable.
+    run: "{netdust_flow}/bin/converge-check.py {feature_dir} --task {feature_dir}/ask.md --not planner --not implementer"
 
   - id: approve-plan      # yield point only — the decision is the seal.
     kind: human           # A site is scope, budget and a client
@@ -84,7 +94,7 @@ nodes:
 
   - id: gate-security     # escaping · nonces · capabilities · SQL
     kind: gate
-    run: ".flow/bin/wp-security.py --base {base_ref}"
+    run: ".flow/bin/wp-security.py --base {base_ref} --require-scope"
 
   - id: gate-suite        # the starter's own umbrella: bin/gate.sh —
     kind: gate            # every quality tier the project declares,
@@ -114,7 +124,9 @@ edges:
   - {from: gate-brief,      to: plan,          when: gate.exit == 0}
   - {from: gate-brief,      to: brief,         when: gate.exit != 0}
   - {from: plan,            to: gate-plan}
-  - {from: gate-plan,       to: approve-plan,  when: gate.exit == 0}
+  - {from: gate-plan,       to: gate-converge, when: gate.exit == 0}
+  - {from: gate-converge,   to: approve-plan,  when: gate.exit == 0}
+  - {from: gate-converge,   to: plan,          when: gate.exit != 0}
   - {from: gate-plan,       to: plan,          when: gate.exit != 0}
   - {from: approve-plan,    to: gate-approval}
   - {from: gate-approval,   to: build,         when: gate.exit == 0}

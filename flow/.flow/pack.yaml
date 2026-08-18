@@ -8,9 +8,6 @@ description: >
   cannot answer. Scaffolded by netdust/wp-starter; runtime installed
   by composer as netdust/flow.
 
-flows:
-  site: flows/site.yaml
-
 binds:
   netdust_flow:
     description: >

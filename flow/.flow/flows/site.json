@@ -13,6 +13,7 @@
         ".flow/craft/site-builder.md"
       ],
       "out": [
+        "ask.md",
         "spec.md"
       ]
     },
@@ -40,6 +41,11 @@
       "id": "gate-plan",
       "kind": "gate",
       "run": ".flow/bin/spec-gate.py {feature_dir}"
+    },
+    {
+      "id": "gate-converge",
+      "kind": "gate",
+      "run": "{netdust_flow}/bin/converge-check.py {feature_dir} --task {feature_dir}/ask.md --not planner --not implementer"
     },
     {
       "id": "approve-plan",
@@ -86,7 +92,7 @@
     {
       "id": "gate-security",
       "kind": "gate",
-      "run": ".flow/bin/wp-security.py --base {base_ref}"
+      "run": ".flow/bin/wp-security.py --base {base_ref} --require-scope"
     },
     {
       "id": "gate-suite",
@@ -145,8 +151,18 @@
     },
     {
       "from": "gate-plan",
+      "to": "gate-converge",
+      "when": "gate.exit == 0"
+    },
+    {
+      "from": "gate-converge",
       "to": "approve-plan",
       "when": "gate.exit == 0"
+    },
+    {
+      "from": "gate-converge",
+      "to": "plan",
+      "when": "gate.exit != 0"
     },
     {
       "from": "gate-plan",

@@ -222,6 +222,22 @@ expect_gate("no review cluster at all is refused",
             "- [ ] T01 build the thing\n", clean=False)
 
 
+# ── --require-scope: an empty diff is a misconfiguration, not a pass ─
+def scope_case() -> None:
+    global checks
+    checks += 1
+    import os
+    p = subprocess.run(
+        [sys.executable, str(SECURITY), "--base", "HEAD", "--require-scope",
+         str(FLOW / "does-not-exist")],
+        capture_output=True, text=True, cwd=str(FLOW.parent))
+    if p.returncode != 1 or "empty scope" not in p.stdout:
+        failures.append(f"require-scope: expected FAIL on empty scope, got "
+                        f"rc={p.returncode}\n    {p.stdout.strip()}")
+
+scope_case()
+
+
 # ── the flow itself ──────────────────────────────────────────────────
 def check_flow() -> None:
     """Whatever else changes, these must hold: no machine gate may route
@@ -240,7 +256,7 @@ def check_flow() -> None:
     gates = {n["id"] for n in doc["nodes"] if n["kind"] == "gate"}
     machine = {g for g in gates if g.startswith("gate-")
                and g not in ("gate-approval", "gate-acceptance", "gate-ledger",
-                             "gate-brief", "gate-plan")}
+                             "gate-brief", "gate-plan", "gate-converge")}
     for e in doc["edges"]:
         if e["from"] in machine and e.get("when", "").endswith("!= 0"):
             if e["to"] != "build":

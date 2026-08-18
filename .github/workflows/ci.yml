@@ -27,6 +27,20 @@ jobs:
       - name: token lint
         run: sh gate/bin/lint-tokens.sh
 
+      # The pack must validate against the runtime's schema — the arm
+      # refuses an invalid pack, so an invalid payload cannot arm on any
+      # site (regression: a stray `flows:` key shipped and did exactly
+      # that; found by agent-evals-v0 run 0002 at arm time).
+      - name: pack.yaml validates against pack.schema.json
+        run: |
+          python - <<'PY'
+          import json, yaml, jsonschema
+          jsonschema.validate(
+              yaml.safe_load(open("flow/.flow/pack.yaml")),
+              json.load(open(".netdust-flow/pack.schema.json")))
+          print("pack.yaml valid")
+          PY
+
       # The gates are code. A security gate nobody tested reports clean
       # because its regex never matched anything.
       - name: gate fixtures + graph shape
