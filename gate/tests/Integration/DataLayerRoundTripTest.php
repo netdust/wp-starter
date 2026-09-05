@@ -39,7 +39,7 @@ final class DataLayerRoundTripTest extends WP_UnitTestCase
         ]);
 
         $listener_calls = 0;
-        add_action('ntdst_model_create_after', function () use (&$listener_calls): void {
+        add_action('ntdst/model/created', function () use (&$listener_calls): void {
             $listener_calls++;
         });
 

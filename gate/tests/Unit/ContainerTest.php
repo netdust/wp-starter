@@ -16,6 +16,8 @@ final class ContainerTestService
 /**
  * Behavioral contract of NTDST_Container (ntdst-core), exercised with
  * no WordPress and no database — the example unit for the PHP unit tier.
+ *
+ * The surface is set/get/has: core-trim T07 removed make()/forget().
  */
 final class ContainerTest extends TestCase
 {
@@ -37,25 +39,22 @@ final class ContainerTest extends TestCase
         $this->assertSame($first, $second);
     }
 
-    public function test_make_returns_a_fresh_instance_on_every_call(): void
-    {
-        $first = $this->container->make(ContainerTestService::class);
-        $second = $this->container->make(ContainerTestService::class);
-
-        $this->assertNotSame($first, $second);
-        $this->assertInstanceOf(ContainerTestService::class, $first);
-    }
-
-    public function test_forget_causes_re_resolution_to_a_new_instance(): void
+    public function test_re_registering_an_id_clears_its_cached_instance(): void
     {
         $this->container->set(ContainerTestService::class);
         $before = $this->container->get(ContainerTestService::class);
 
-        $this->container->forget(ContainerTestService::class);
         $this->container->set(ContainerTestService::class);
         $after = $this->container->get(ContainerTestService::class);
 
         $this->assertNotSame($before, $after);
+    }
+
+    public function test_an_unregistered_but_existing_class_is_autowired(): void
+    {
+        $resolved = $this->container->get(ContainerTestService::class);
+
+        $this->assertInstanceOf(ContainerTestService::class, $resolved);
     }
 
     public function test_factory_closure_receives_the_container_itself(): void
@@ -63,7 +62,7 @@ final class ContainerTest extends TestCase
         $received = null;
         $this->container->set('tagged.service', function (NTDST_Container $c) use (&$received): ContainerTestService {
             $received = $c;
-            $service = $c->make(ContainerTestService::class);
+            $service = $c->get(ContainerTestService::class);
             $service->tag = 'built-by-factory';
 
             return $service;
@@ -76,6 +75,15 @@ final class ContainerTest extends TestCase
         $this->assertSame('built-by-factory', $resolved->tag);
     }
 
+    public function test_has_covers_registered_ids_and_autowirable_classes(): void
+    {
+        $this->container->set('some.value', 42);
+
+        $this->assertTrue($this->container->has('some.value'));
+        $this->assertTrue($this->container->has(ContainerTestService::class));
+        $this->assertFalse($this->container->has('totally.unknown'));
+    }
+
     public function test_get_throws_for_an_unknown_service_id(): void
     {
         $this->expectException(RuntimeException::class);
@@ -84,11 +92,13 @@ final class ContainerTest extends TestCase
         $this->container->get('totally.unknown');
     }
 
-    public function test_make_rejects_unknown_constructor_parameters(): void
+    public function test_a_binding_pointing_at_a_missing_class_fails_loud(): void
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unknown parameter(s)');
+        $this->container->set('broken.binding', 'NtdstTests\\Unit\\NoSuchService');
 
-        $this->container->make(ContainerTestService::class, ['typoedParam' => 1]);
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('points to non-existent class');
+
+        $this->container->get('broken.binding');
     }
 }
