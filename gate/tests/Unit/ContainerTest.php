@@ -16,8 +16,14 @@ final class ContainerTestService
 /** Depends on itself — the shape the circular-dependency guard exists for. */
 final class ContainerCircularService
 {
+    public ContainerCircularService $self;
+
     public function __construct(ContainerCircularService $self)
     {
+        // Never actually reached: resolving this constructor is what trips the
+        // guard. Assigned anyway so the fixture carries no unused parameter of
+        // its own — new code in this payload stays clean, baseline or not.
+        $this->self = $self;
     }
 }
 
