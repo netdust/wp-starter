@@ -140,6 +140,21 @@ Gate tokens, rendered by `scaffold_wp_starter` across the copied `gate/` files:
 | `{{GATE_WP_DIR}}` | `web/wp` | `app/wp` | WordPress core dir, relative to project root |
 | `{{GATE_CONTENT_DIR}}` | `web/app` | `app/content` | Content dir (mu-plugins/, themes/), relative to project root |
 
+### Projects with no theme of their own
+
+The theme-JS tiers (`lint:js`, `test:js`, `build:check`, `audit:js`) loop
+`{{GATE_CONTENT_DIR}}/themes/*/package.json`, and zero packages is a gate
+FAILURE by default — that is what catches a theme dir that quietly went missing.
+
+A site that genuinely has no theme of its own (YOOtheme, a page builder, a
+headless front end) declares that with an empty `.gate-no-theme-js` file in the
+project root. Those tiers then report the skip and exit 0 instead of failing.
+The marker never suppresses a theme that DOES carry a `package.json` — real
+packages always win, so a stale marker cannot silently drop the JS tier.
+
+Behaviour is covered by `tests/js-gate.test.sh`, run in CI and not shipped in
+the payload.
+
 ## Consumers
 
 - `netdust-wp-manager` `scripts/new-site.sh` — via `scaffold_wp_starter`
