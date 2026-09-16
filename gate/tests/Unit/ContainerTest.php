@@ -13,9 +13,24 @@ final class ContainerTestService
     public string $tag = 'default';
 }
 
+/** Depends on itself — the shape the circular-dependency guard exists for. */
+final class ContainerCircularService
+{
+    public function __construct(ContainerCircularService $self)
+    {
+    }
+}
+
 /**
  * Behavioral contract of NTDST_Container (ntdst-core), exercised with
  * no WordPress and no database — the example unit for the PHP unit tier.
+ *
+ * Tracks the post-trim container: set, get, has. `make()` and `forget()` were
+ * removed from ntdst-core in `feat(core-trim): T07 — Container keeps
+ * set/get/has`, and the three tests covering them were obsolete rather than
+ * failing — they errored against every 5.x install. Every assertion below is
+ * derived from core/Container.php as it actually is; do not reinstate a test
+ * for behaviour the framework dropped.
  */
 final class ContainerTest extends TestCase
 {
@@ -37,25 +52,15 @@ final class ContainerTest extends TestCase
         $this->assertSame($first, $second);
     }
 
-    public function test_make_returns_a_fresh_instance_on_every_call(): void
+    public function test_has_covers_registered_ids_and_autowirable_classes(): void
     {
-        $first = $this->container->make(ContainerTestService::class);
-        $second = $this->container->make(ContainerTestService::class);
+        $this->container->set('registered.id', 'a primitive');
 
-        $this->assertNotSame($first, $second);
-        $this->assertInstanceOf(ContainerTestService::class, $first);
-    }
-
-    public function test_forget_causes_re_resolution_to_a_new_instance(): void
-    {
-        $this->container->set(ContainerTestService::class);
-        $before = $this->container->get(ContainerTestService::class);
-
-        $this->container->forget(ContainerTestService::class);
-        $this->container->set(ContainerTestService::class);
-        $after = $this->container->get(ContainerTestService::class);
-
-        $this->assertNotSame($before, $after);
+        $this->assertTrue($this->container->has('registered.id'));
+        // PSR-11 semantics here: an unregistered class that exists can be
+        // autowired, so has() promises get() will not throw for it.
+        $this->assertTrue($this->container->has(ContainerTestService::class));
+        $this->assertFalse($this->container->has('totally.unknown'));
     }
 
     public function test_factory_closure_receives_the_container_itself(): void
@@ -63,7 +68,7 @@ final class ContainerTest extends TestCase
         $received = null;
         $this->container->set('tagged.service', function (NTDST_Container $c) use (&$received): ContainerTestService {
             $received = $c;
-            $service = $c->make(ContainerTestService::class);
+            $service = new ContainerTestService();
             $service->tag = 'built-by-factory';
 
             return $service;
@@ -84,11 +89,23 @@ final class ContainerTest extends TestCase
         $this->container->get('totally.unknown');
     }
 
-    public function test_make_rejects_unknown_constructor_parameters(): void
+    public function test_get_detects_a_circular_dependency(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unknown parameter(s)');
+        $this->expectExceptionMessage('Circular dependency detected');
 
-        $this->container->make(ContainerTestService::class, ['typoedParam' => 1]);
+        $this->container->get(ContainerCircularService::class);
+    }
+
+    public function test_a_binding_pointing_at_a_missing_class_fails_loudly(): void
+    {
+        // A typo'd class binding must not be mistaken for a primitive string
+        // value — that distinction is what looksLikeClassName() is for.
+        $this->container->set('mistyped.binding', 'NtdstTests\Unit\NoSuchService');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('points to non-existent class');
+
+        $this->container->get('mistyped.binding');
     }
 }
