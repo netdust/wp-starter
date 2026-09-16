@@ -152,6 +152,21 @@ project root. Those tiers then report the skip and exit 0 instead of failing.
 The marker never suppresses a theme that DOES carry a `package.json` — real
 packages always win, so a stale marker cannot silently drop the JS tier.
 
+The marker is not taken on faith: `{{GATE_CONTENT_DIR}}/themes` must exist, or
+the tier refuses to skip and says so. Zero packages otherwise also means "the
+gate cannot see the theme tree" — a mis-rendered token, a deleted content dir —
+and reporting "no theme JS" about a tree nobody looked at is the failure the
+guard was for.
+
+**Known limit.** A theme dir that carries JS but lost its `package.json` still
+skips. That state is indistinguishable from the normal one for every project
+this marker exists for: their `themes/` holds licensed parents (YOOtheme,
+BuddyBoss — hundreds of `.js` files, no `package.json`, by design and forever).
+Failing on it would make the marker unusable for its own population. Closing it
+properly means the marker DECLARING which theme dirs it excuses, so a new or
+changed theme has to be re-declared — a design change, not a guard, and not yet
+made.
+
 Behaviour is covered by `tests/js-gate.test.sh`, run in CI and not shipped in
 the payload.
 

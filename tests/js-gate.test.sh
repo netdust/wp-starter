@@ -77,6 +77,27 @@ check "ran npm once" "$(wc -l < "$WORK/npm.log" | tr -d ' ')" "1"
 check "ran it in the theme dir" "$(grep -c -- "--prefix $CONTENT/themes/acme" "$WORK/npm.log")" "1"
 rm -rf "$WORK"
 
+echo "js-gate — marker set but the theme tree is not there at all"
+# The hole the marker opened: n==0 also means "the gate cannot see the themes",
+# e.g. a mis-rendered {{GATE_CONTENT_DIR}} or a deleted content dir. Skipping
+# then reports "no theme JS" about a tree nobody looked at.
+fixture "" ".gate-no-theme-js"
+rm -rf "$WORK/$CONTENT/themes"
+run
+check "refuses to skip" "$RC" "1"
+check "names the missing directory" "$(grep -c 'does not exist' "$WORK/err")" "1"
+check "ran no npm" "$(wc -l < "$WORK/npm.log" | tr -d ' ')" "0"
+rm -rf "$WORK"
+
+echo "js-gate — marker set, themes/ exists but is empty"
+# The legitimate case the marker is FOR: the directory is there, it simply holds
+# no theme of this project's own. Must still skip cleanly.
+fixture "" ".gate-no-theme-js"
+run
+check "skips" "$RC" "0"
+check "ran no npm" "$(wc -l < "$WORK/npm.log" | tr -d ' ')" "0"
+rm -rf "$WORK"
+
 echo "js-gate — a theme package.json exists AND the marker is present"
 # The marker declares "this project has no theme JS". A theme that DOES carry a
 # package.json contradicts it, and the real packages win: skipping them because

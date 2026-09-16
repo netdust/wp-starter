@@ -21,6 +21,23 @@ if [ "$n" -eq 0 ]; then
   # no theme JS to gate. That has to be DECLARED: the marker is a deliberate
   # act, so a project that merely lost its theme dir still goes red.
   if [ -f .gate-no-theme-js ]; then
+    # Do not take the declaration on faith. n==0 also happens when the theme
+    # tree is not where the gate thinks it is — a mis-rendered
+    # {{GATE_CONTENT_DIR}}, a deleted content dir, a run from the wrong cwd —
+    # and skipping then reports "no theme JS" for a project the gate simply
+    # cannot see. The directory must at least exist.
+    if [ ! -d {{GATE_CONTENT_DIR}}/themes ]; then
+      echo "$label: .gate-no-theme-js is set but {{GATE_CONTENT_DIR}}/themes does not exist — refusing to skip" >&2
+      exit 1
+    fi
+    # KNOWN LIMIT, deliberately not enforced: a theme dir that carries JS but
+    # lost its package.json also lands here. That cannot be told apart from the
+    # normal state of every project this marker exists for — their themes/ holds
+    # licensed parents (YOOtheme, BuddyBoss) with hundreds of .js files and no
+    # package.json, by design and forever. Failing on that would make the marker
+    # unusable for exactly its intended population. Closing it properly means
+    # the marker DECLARING which theme dirs it excuses; that is a design change,
+    # not a guard.
     echo "$label: skipped — this project declares no theme JS (.gate-no-theme-js)"
     exit 0
   fi
