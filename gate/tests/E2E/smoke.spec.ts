@@ -56,7 +56,13 @@ test.describe('smoke', () => {
     // URL derived by bin/e2e.sh from the seeded post itself (I5) — the spec
     // carries no assumption about the permalink structure.
     await page.goto(requiredEnv('E2E_FIXTURE_URL'));
-    await expect(page.getByRole('heading', { name: 'E2E Fixture Post' })).toBeVisible();
-    await expect(page.getByText('Seeded by bin/e2e.sh via wp-cli.')).toBeVisible();
+    // `level: 1` is load-bearing, not decoration. A block theme renders the
+    // post title again inside its "More posts" listing (twentytwentyfive uses
+    // an <h3>), so an unqualified heading match resolves to two elements and
+    // Playwright fails on strict mode. Narrowing to the page's own h1 is more
+    // specific than the original, not less: it asserts this is THE post page
+    // rather than any page that happens to mention the title.
+    await expect(page.getByRole('heading', { name: 'E2E Fixture Post', level: 1 })).toBeVisible();
+    await expect(page.getByText('Seeded by bin/e2e.sh via wp-cli.').first()).toBeVisible();
   });
 });

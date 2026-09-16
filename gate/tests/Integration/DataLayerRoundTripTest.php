@@ -38,10 +38,19 @@ final class DataLayerRoundTripTest extends WP_UnitTestCase
             'meta_prefix' => 'gate_',
         ]);
 
+        // ntdst-core fires slash-separated lifecycle actions —
+        // `ntdst/model/created`, never the underscore form. The listener takes
+        // the real first argument so a changed signature surfaces here instead
+        // of being swallowed by a zero-argument closure.
         $listener_calls = 0;
-        add_action('ntdst_model_create_after', function () use (&$listener_calls): void {
-            $listener_calls++;
-        });
+        $listener_post_type = null;
+        add_action(
+            'ntdst/model/created',
+            function (string $post_type) use (&$listener_calls, &$listener_post_type): void {
+                $listener_calls++;
+                $listener_post_type = $post_type;
+            }
+        );
 
         $created = $model->create(['title' => 'Pilot item', 'score' => 42]);
 
@@ -55,8 +64,10 @@ final class DataLayerRoundTripTest extends WP_UnitTestCase
         $this->assertSame('Pilot item', $stored->post_title);
         $this->assertSame(42, (int) get_post_meta($created->ID, 'gate_score', true));
 
-        // The REAL hook dispatcher fired the lifecycle action exactly once.
+        // The REAL hook dispatcher fired the lifecycle action exactly once, and
+        // handed it the post type it created.
         $this->assertSame(1, $listener_calls);
+        $this->assertSame('gate_item', $listener_post_type);
     }
 
     public function test_create_rejects_missing_required_field_and_persists_nothing(): void
