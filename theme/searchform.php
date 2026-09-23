@@ -20,6 +20,6 @@ defined('ABSPATH') || exit;
         name="s"
     />
     <button type="submit" class="btn-primary" aria-label="<?php esc_attr_e('Zoeken', '{{SLUG}}'); ?>">
-        <?php echo {{SLUG_SNAKE}}_icon('search', 'w-5 h-5'); ?>
+        <?php echo {{SLUG_SNAKE}}_icon('search', 'w-5 h-5'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- theme-shipped SVG, class escaped in the helper. ?>
     </button>
 </form>

@@ -60,8 +60,8 @@ defined('ABSPATH') || exit;
 
                 <!-- Mobile Menu Toggle -->
                 <button @click="toggle()" class="lg:hidden p-2 -mr-2" aria-label="<?php esc_attr_e('Menu', '{{SLUG}}'); ?>">
-                    <span x-show="!open"><?php echo {{SLUG_SNAKE}}_icon('menu', 'w-6 h-6'); ?></span>
-                    <span x-show="open" x-cloak><?php echo {{SLUG_SNAKE}}_icon('x', 'w-6 h-6'); ?></span>
+                    <span x-show="!open"><?php echo {{SLUG_SNAKE}}_icon('menu', 'w-6 h-6'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- theme-shipped SVG, class escaped in the helper. ?></span>
+                    <span x-show="open" x-cloak><?php echo {{SLUG_SNAKE}}_icon('x', 'w-6 h-6'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- theme-shipped SVG, class escaped in the helper. ?></span>
                 </button>
             </div>
         </div>

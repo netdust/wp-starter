@@ -13,7 +13,7 @@ stderr, and propagates its real exit code (`bin/gate.sh`).
 
 | Tier | Command | DDEV mirror | What it checks | Where it runs | Typical time |
 |---|---|---|---|---|---|
-| 1 | `composer lint` | `ddev lint` | phpcs: PSR-12 + WordPress Security/DB sniffs + PHP-compat (8.3) — currently scoped to `tests/` (see phpcs.xml); widen as mu-plugin/theme debt is paid | either | < 1 s |
+| 1 | `composer lint` | `ddev lint` | phpcs: WordPress Security/DB sniffs on `tests/` and our own mu-plugins + themes; PSR-12 + PHP-compat (8.3) on `tests/` only (see phpcs.xml) | either | < 1 s |
 | 2 | `composer lint:js` | `ddev lint-js` | ESLint + Stylelint, per theme package | either | ~1 s |
 | 3 | `composer analyse` | `ddev analyse` | PHPStan static analysis | **host only** — the phpstan cache is context-coupled; a container run poisons the mounted cache for the host-orchestrated gate | ~1 s |
 | 4 | `composer audit:deps` | `ddev audit` | `composer audit` + `npm audit --audit-level=high` (theme) | either | ~3 s |
