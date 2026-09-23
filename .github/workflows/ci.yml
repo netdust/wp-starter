@@ -20,3 +20,10 @@ jobs:
       - name: shell gates are valid bash
         run: |
           for f in gate/bin/*.sh; do bash -n "$f" || exit 1; done
+
+      # Parsing is not behaviour. js-gate.sh decides WHICH packages the three
+      # JS tiers run, and whether zero packages is a failure or a declared
+      # skip. Sites depend on that decision, so it is tested rather than
+      # eyeballed.
+      - name: js-gate behaves
+        run: sh tests/js-gate.test.sh

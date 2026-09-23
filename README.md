@@ -140,6 +140,36 @@ Gate tokens, rendered by `scaffold_wp_starter` across the copied `gate/` files:
 | `{{GATE_WP_DIR}}` | `web/wp` | `app/wp` | WordPress core dir, relative to project root |
 | `{{GATE_CONTENT_DIR}}` | `web/app` | `app/content` | Content dir (mu-plugins/, themes/), relative to project root |
 
+### Projects with no theme of their own
+
+The theme-JS tiers (`lint:js`, `test:js`, `build:check`, `audit:js`) loop
+`{{GATE_CONTENT_DIR}}/themes/*/package.json`, and zero packages is a gate
+FAILURE by default — that is what catches a theme dir that quietly went missing.
+
+A site that genuinely has no theme of its own (YOOtheme, a page builder, a
+headless front end) declares that with an empty `.gate-no-theme-js` file in the
+project root. Those tiers then report the skip and exit 0 instead of failing.
+The marker never suppresses a theme that DOES carry a `package.json` — real
+packages always win, so a stale marker cannot silently drop the JS tier.
+
+The marker is not taken on faith: `{{GATE_CONTENT_DIR}}/themes` must exist, or
+the tier refuses to skip and says so. Zero packages otherwise also means "the
+gate cannot see the theme tree" — a mis-rendered token, a deleted content dir —
+and reporting "no theme JS" about a tree nobody looked at is the failure the
+guard was for.
+
+**Known limit.** A theme dir that carries JS but lost its `package.json` still
+skips. That state is indistinguishable from the normal one for every project
+this marker exists for: their `themes/` holds licensed parents (YOOtheme,
+BuddyBoss — hundreds of `.js` files, no `package.json`, by design and forever).
+Failing on it would make the marker unusable for its own population. Closing it
+properly means the marker DECLARING which theme dirs it excuses, so a new or
+changed theme has to be re-declared — a design change, not a guard, and not yet
+made.
+
+Behaviour is covered by `tests/js-gate.test.sh`, run in CI and not shipped in
+the payload.
+
 ## Consumers
 
 - `netdust-wp-manager` `scripts/new-site.sh` — via `scaffold_wp_starter`
