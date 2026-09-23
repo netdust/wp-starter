@@ -35,7 +35,7 @@ declare(strict_types=1);
  */
 function {{SLUG_SNAKE}}_template_part(string $slug, ?string $name = null, array $args = []): void
 {
-    echo {{SLUG_SNAKE}}_template_html($slug, $name, $args);
+    echo {{SLUG_SNAKE}}_template_html($slug, $name, $args); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- each partial escapes its own output.
 }
 
 /**

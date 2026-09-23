@@ -28,7 +28,7 @@ $show_button = !empty($action) && !empty($url);
 ?>
 <div class="text-center py-12 px-4">
     <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-surface-alt flex items-center justify-center">
-        <?php echo {{SLUG_SNAKE}}_icon($icon, 'w-8 h-8 text-text-muted'); ?>
+        <?php echo {{SLUG_SNAKE}}_icon($icon, 'w-8 h-8 text-text-muted'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- theme-shipped SVG, class escaped in the helper. ?>
     </div>
 
     <h3 class="font-heading font-semibold text-lg text-text mb-2"><?php echo esc_html($title); ?></h3>

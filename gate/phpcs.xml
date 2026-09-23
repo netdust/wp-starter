@@ -3,19 +3,18 @@
     <description>Lint gate: PSR-12 base + WordPress security/DB sniffs + PHP 8.3 compatibility.</description>
 
     <!--
-        GATE SCOPE: tests/ only.
-
-        The full intended surface mirrors phpstan.neon:
-        {{GATE_CONTENT_DIR}}/mu-plugins + {{GATE_CONTENT_DIR}}/themes + tests. phpcs has no baseline
-        mechanism, and pre-existing framework/theme debt is not fixed as part
-        of gate introduction — so the gate scans only what is green today.
-        Add mu-plugins/themes back as their debt is paid.
-        Full-surface check by hand: vendor/bin/phpcs {{GATE_CONTENT_DIR}}/mu-plugins {{GATE_CONTENT_DIR}}/themes
+        GATE SCOPE: tests/ under every sniff; OUR mu-plugins and themes under the
+        WordPress security + DB sniffs only. PSR-12 style debt in existing code is
+        not a reason to leave unescaped output unscanned, so style stays tests-only
+        and security covers everything we own. Excludes mirror phpstan.neon.
     -->
     <file>tests</file>
+    <file>{{GATE_CONTENT_DIR}}/mu-plugins</file>
+    <file>{{GATE_CONTENT_DIR}}/themes</file>
 
-    <!-- Third-party / not our code (applies when wider paths are passed manually) -->
+    <!-- Third-party / not our code -->
     <exclude-pattern>*/{{GATE_CONTENT_DIR}}/themes/twentytwentyfive/*</exclude-pattern>
+    <exclude-pattern>*/{{GATE_CONTENT_DIR}}/themes/yootheme/*</exclude-pattern>
     <exclude-pattern>*/{{GATE_CONTENT_DIR}}/mu-plugins/bedrock-disallow-indexing/*</exclude-pattern>
     <!-- netdust/ntdst-core + netdust/ntdst-baseline are composer packages with
          their own repo, gate, and reviewers (github.com/netdust/ntdst-core,
@@ -32,8 +31,10 @@
     <arg name="colors"/>
     <arg value="sp"/>
 
-    <!-- Base: PSR-12 only. Full WPCS ruleset rejected — no WPCS formatting sniffs. -->
-    <rule ref="PSR12"/>
+    <!-- Base: PSR-12 only, on tests/. Full WPCS ruleset rejected — no WPCS formatting sniffs. -->
+    <rule ref="PSR12">
+        <exclude-pattern>*/{{GATE_CONTENT_DIR}}/*</exclude-pattern>
+    </rule>
 
     <!--
         Test-convention carve-outs, scoped to tests/ ONLY (security, DB and
@@ -55,6 +56,8 @@
     <rule ref="WordPress.DB"/>
 
     <!-- PHP compatibility, pinned to the deployment target (not a range floor) -->
-    <rule ref="PHPCompatibilityWP"/>
+    <rule ref="PHPCompatibilityWP">
+        <exclude-pattern>*/{{GATE_CONTENT_DIR}}/*</exclude-pattern>
+    </rule>
     <config name="testVersion" value="8.3"/>
 </ruleset>
