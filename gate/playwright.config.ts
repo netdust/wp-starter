@@ -15,8 +15,13 @@ if (!baseURL) {
   );
 }
 
+// A remote run (make e2e env=<env>) shares one server and reaches WP-CLI over
+// SSH: fewer workers and a longer budget, or slow endpoints time out under load.
+const remote = Boolean(process.env.E2E_ENV) && process.env.E2E_ENV !== 'local';
+
 export default defineConfig({
   testDir: './tests/E2E',
+  ...(remote ? { workers: Number(process.env.E2E_WORKERS) || 3, timeout: 60_000 } : {}),
   use: {
     baseURL,
     // mkcert's root CA is machine-local; config-level tolerance keeps this

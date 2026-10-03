@@ -36,6 +36,9 @@ if command -v ddev >/dev/null 2>&1; then
   ddev exec wp user create e2e-admin e2e-admin@example.test \
     --role=administrator --user_pass="$E2E_PASS" >/dev/null 2>&1 \
     || ddev exec wp user update e2e-admin --user_pass="$E2E_PASS" >/dev/null
+  # WordPress keeps all of a user's sessions in one meta row and parallel workers
+  # sign in at once: start each run with none, or a late login drops a live token.
+  ddev exec wp user session destroy e2e-admin --all >/dev/null
 
   # Fixture post (slug pinned so the seeded permalink is deterministic)
   if [ -z "$(ddev exec wp post list --name=e2e-fixture-post --post_type=post --post_status=publish --field=ID)" ]; then
