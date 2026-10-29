@@ -15,8 +15,8 @@ SUT=$HERE/bin/package-gate.sh
 
 PASS=0; FAIL=0
 
-# fixture <name> [requires-core] [own-gate] [lock-ignored] — a minimal package at $PKG, a git
-# checkout (so check-ignore works), stamped so `written` can list what a run touched.
+# fixture <name> [requires-core] [requires-core-dev] [own-gate] [lock-ignored] [repos-object] — a
+# minimal package at $PKG, a git checkout (so check-ignore works), snapshotted for `written`.
 fixture() {
   name=$1; shift
   WORK=$(mktemp -d); PKG=$WORK/pkg; SKIP=
@@ -29,6 +29,8 @@ fixture() {
   for opt in "$@"; do
     case $opt in
       requires-core) edit '.require."netdust/ntdst-core" = "^5.4"' ;;
+      requires-core-dev) edit '."require-dev"."netdust/ntdst-core" = "*"' ;;
+      repos-object) edit '.repositories = {"wpackagist": {"type": "composer", "url": "https://wpackagist.org"}}' ;;
       own-gate) edit '.scripts.gate = ["@syntax","@test"] | .scripts.lint = "php -l"' ;;
       lock-ignored) printf 'composer.lock\n' >> "$PKG/.gitignore" ;;
     esac
@@ -42,12 +44,11 @@ edit() {
   jq "$1" "$PKG/composer.json" > "$PKG/composer.json.new" && mv "$PKG/composer.json.new" "$PKG/composer.json"
 }
 
-stamp() { : > "$WORK/stamp"; }
-
-# written — every path under the package touched since the stamp (.git excluded); "" is nothing.
-written() {
-  find "$PKG" -path "$PKG/.git" -prune -o -newer "$WORK/stamp" -print | sed "s|^$PKG/||" | sort | paste -sd' '
-}
+# stamp / written — a checksum of every file under the package (.git excluded) before a run;
+# `written` prints nothing when the tree is unchanged, so no mtime assumption is made.
+tree_sum() { find "$PKG" -path "$PKG/.git" -prune -o -type f -exec cksum {} + | sort | cksum; }
+stamp() { BEFORE=$(tree_sum); }
+written() { [ "$(tree_sum)" = "$BEFORE" ] || echo "tree changed"; }
 
 # run <package-root> — the renderer from a neutral cwd, stdout/stderr captured. A missing
 # renderer is one FAIL per run and the run's checks are skipped.
@@ -106,6 +107,24 @@ stamp
 run "$PKG"
 check "exits 64" "$RC" "64"
 check "says why" "$(has 'installed copy' "$WORK/err")" "yes"
+check "wrote nothing" "$(written)" ""
+rm -rf "$WORK"
+
+echo "package-gate — refuses a site's installed copy under app/content/mu-plugins (stackwp)"
+fixture acme
+mkdir -p "$WORK/app/content/mu-plugins" && mv "$PKG" "$WORK/app/content/mu-plugins/acme" && PKG=$WORK/app/content/mu-plugins/acme
+stamp
+run "$PKG"
+check "exits 64" "$RC" "64"
+check "says why" "$(has 'installed copy' "$WORK/err")" "yes"
+check "wrote nothing" "$(written)" ""
+rm -rf "$WORK"
+
+echo "package-gate — refuses a composer.json whose repositories is an object, writes nothing"
+fixture acme repos-object; stamp
+run "$PKG"
+check "exits 64" "$RC" "64"
+check "names repositories" "$(has 'repositories' "$WORK/err")" "yes"
 check "wrote nothing" "$(written)" ""
 rm -rf "$WORK"
 
@@ -203,6 +222,14 @@ check "exits 0" "$RC" "0"
 check "ntdst-coreloader.php landed" "$(exists web/app/mu-plugins/ntdst-coreloader.php)" "yes"
 check "it is wp-starter's shim, verbatim" "$(same "$PKG/web/app/mu-plugins/ntdst-coreloader.php" "$HERE/mu-plugins/ntdst-coreloader.php")" "same"
 check "require is untouched" "$(jqv '.require')" '{"netdust/ntdst-core":"^5.4"}'
+rm -rf "$WORK"
+
+echo "package-gate — a package requiring ntdst-core in require-dev gets the core loader shim too"
+fixture acme requires-core-dev
+run "$PKG"
+check "exits 0" "$RC" "0"
+check "ntdst-coreloader.php landed" "$(exists web/app/mu-plugins/ntdst-coreloader.php)" "yes"
+check "the neighbour stays where it was declared" "$(jqv '."require-dev"."netdust/ntdst-core"')" '"*"'
 rm -rf "$WORK"
 
 echo "package-gate — says so when composer.lock is gitignored"

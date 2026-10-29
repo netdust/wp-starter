@@ -19,7 +19,7 @@ refuse() { echo "refused: $1" >&2; exit 64; }
 
 [[ $# -eq 1 ]] || refuse "usage: bin/package-gate.sh <package-root>"
 root="$(realpath -e "$1" 2>/dev/null)" || refuse "$1 does not exist"
-[[ "$root" != */web/app/mu-plugins/* ]] || refuse "$root is a site's installed copy; render onto the package's own checkout"
+[[ "$root" != */mu-plugins/* ]] || refuse "$root is a site's installed copy; render onto the package's own checkout"
 [[ -f "$root/composer.json" ]] || refuse "$root has no composer.json"
 name="$(jq -r '.name // empty' "$root/composer.json")" || refuse "$root/composer.json is not valid JSON"
 [[ -n "$name" ]] || refuse "$root/composer.json declares no name"
@@ -27,6 +27,9 @@ type="$(jq -r '.type // empty' "$root/composer.json")"
 [[ "$type" == wordpress-muplugin ]] || refuse "$root/composer.json is type '${type:-none}', not wordpress-muplugin"
 pkg="${name#*/}"
 [[ -f "$root/$pkg.php" ]] || refuse "$root/$pkg.php is missing — a package's main file sits at its root"
+if jq -e '.repositories | type == "object"' "$root/composer.json" >/dev/null; then
+  refuse "$root/composer.json declares repositories as an object; the shape appends to the list form"
+fi
 
 site_only() {
   case $1 in
@@ -44,7 +47,7 @@ tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 
 # The file list: gate/ minus the site-only entries, the overlay on top (it wins where both exist),
-# and the core loader shim for a package that requires ntdst-core.
+# and the core loader shim for a package that declares ntdst-core, in require or require-dev.
 declare -A src=()
 while IFS= read -r -d '' f; do
   rel="${f#"$here/gate/"}"
@@ -54,7 +57,7 @@ while IFS= read -r -d '' f; do
   rel="${f#"$here/package-gate/"}"
   fragment "$rel" || src["$rel"]="$f"
 done < <(find "$here/package-gate" -type f -print0)
-if jq -e '.require."netdust/ntdst-core"' "$root/composer.json" >/dev/null; then
+if jq -e '((.require // {}) + (."require-dev" // {}))."netdust/ntdst-core"' "$root/composer.json" >/dev/null; then
   src["$content_dir/mu-plugins/ntdst-coreloader.php"]="$here/mu-plugins/ntdst-coreloader.php"
 fi
 

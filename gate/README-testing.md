@@ -138,15 +138,15 @@ Not used, by name: Playground, Blueprints, wp-env, a shared test site.
 1. `bash <wp-starter>/bin/package-gate.sh <package-root>` renders the shape, merges the
    composer fragment and appends the `.gitignore` / `.gitattributes` lines; it prints `kept:`
    for a `phpcs.xml` or `phpstan.neon` the package already has — its own tier config wins.
-2. `composer install`, then `npm install` (Playwright), then `ddev start`: the post-start
+2. A manifest pinning `phpunit/phpunit ^10.5` moves to `^9.6` (§4f) — Composer refuses it otherwise.
+3. `composer install`, then `npm install` (Playwright), then `ddev start`: the post-start
    hook installs WordPress and provisions `wptests` (a running project needs `ddev restart`).
-3. Commit `composer.lock` if the renderer said it is gitignored: `deps:latest` reads the lock.
-4. Exclude `web/`, `node_modules/`, `.phpstan-cache/` and `.ddev/` from every root-walking
+4. Commit `composer.lock` if the renderer said it is gitignored: `deps:latest` reads the lock.
+5. Exclude `web/`, `node_modules/`, `.phpstan-cache/` and `.ddev/` from every root-walking
    sweep the package carries — ABSPATH guards, removed-symbol greps, invariant checks,
    integrity tests, and a `php -l` sweep over `.` (PHPStan's `resultCache.php` is not PHP) —
    and exempt the shape's `tests/bootstrap-*.php`, `tests/wp-tests-config.php` and
    `tests/Integration/` from the ABSPATH guard the way `tests/bootstrap.php` already is.
-5. A manifest pinning `phpunit/phpunit ^10.5` moves to `^9.6` first (§4f).
 6. `composer gate` is the whole Close; the package's former `gate` script runs as `gate:package`.
 
 **What the renderer refuses**, writing nothing: no `composer.json`, a type other than
@@ -173,11 +173,11 @@ the committed shape travels: `.ddev/`, `.gate-no-theme-js`, `.phpstan-cache/.git
 `phpunit.{unit,integration}.xml`, `playwright.config.ts`, `tsconfig.json`, `wp-cli.yml`,
 `tests/` (both bootstraps, `wp-tests-config.php`, `bootstrap-site.php`,
 `Integration/LoaderTest.php`, `E2E/smoke.spec.ts`), `index.php` and `wp-config.php` under
-`web/`, and the shim. Each is inert under `mu-plugins/<name>/`: a nested shim is not
-top-level, so WordPress never loads it; that `wp-config.php` sits beside no WordPress;
-`.ddev/` is not a project root; the site's `phpcs.xml` / `phpstan.neon` exclude
-`mu-plugins/ntdst-*`; and the fragment's manifest keys are root-only in Composer. A dist
-install (`git archive`) carries none of it: every path the shape adds is `export-ignore`.
+`web/`, and the shim. Each is inert under `mu-plugins/<name>/`: a nested shim is not top-level,
+so WordPress never loads it; that `wp-config.php` sits beside no WordPress; the site's
+`phpcs.xml` / `phpstan.neon` exclude `mu-plugins/ntdst-*`; the manifest keys are root-only in
+Composer; and `ddev` is run from the site root (inside the package directory it resolves the
+package's own project). A dist install (`git archive`) carries none of it — all `export-ignore`.
 
 **A site** pinning `roots/wordpress` or `wp-phpunit/wp-phpunit` exactly goes red at
 `deps:latest` until the constraint is widened. `roave/security-advisories` is not part of the

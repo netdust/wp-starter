@@ -59,7 +59,7 @@ echo "gate-tiers — a site: every tier green, no gate:package declared"
 fixture "$SITE"
 run
 check "exits 0" "$RC" "0"
-check "dispatches the eleven tiers in the locked order" "$(dispatched)" "lint lint:js analyse audit:deps test:unit test:js build:check deps-latest test:int test:e2e"
+check "dispatches the ten tiers in the locked order (gate:package skipped)" "$(dispatched)" "lint lint:js analyse audit:deps test:unit test:js build:check deps-latest test:int test:e2e"
 check "says gate:package was skipped, and why" "$(has '^gate:package: none declared — skipped$' "$WORK/out")" "yes"
 check "ends green" "$(tail -n1 "$WORK/out")" "gate: all tiers green"
 rm -rf "$WORK"

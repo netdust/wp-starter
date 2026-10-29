@@ -78,6 +78,7 @@ run STUB_EXIT_NETDUST=1
 check "exits 1" "$RC" "1"
 check "names netdust/*" "$(has 'netdust/\*' "$WORK/err")" "yes"
 check "says it may be unresolvable" "$(has 'unresolvable' "$WORK/err")" "yes"
+check "the fix line quotes the glob" "$(has "composer update 'netdust/\\*' --with-dependencies" "$WORK/err")" "yes"
 rm -rf "$WORK"
 
 echo "deps-latest — no composer.lock"
