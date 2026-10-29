@@ -23,6 +23,13 @@ regardless of stack (bedrock | stackwp):
   copied to the project root then rendered with the gate tokens (absorbed from
   `netdust/bedrock` in T02 of `specs/new-site-stack-choice`)
 
+  Two shapes, one home: a **package** (a `composer.json` of type `wordpress-muplugin`)
+  renders the same `gate/` minus its site-only files plus the `package-gate/` overlay onto
+  its own root with `bin/package-gate.sh`, hosts the newest WordPress in `require-dev`, and
+  runs every tier on its own DDEV project (`gate/README-testing.md` §6). A gate fix lands
+  here once and reaches both shapes. Proven on 2026-10-29 by a throwaway render of
+  ntdst-core on WordPress 7.1.4 / wp-phpunit 7.1.3 (`specs/package-gate/`).
+
 ```
 wp-starter/
 ├── mu-plugins/
@@ -30,7 +37,9 @@ wp-starter/
 │   └── ntdst-baselineloader.php   ← copied verbatim; requires the composer-installed package
 ├── theme/                     ← preset `plain`  → themes/<slug>/, then tokens rendered
 ├── theme-yootheme/            ← preset `yootheme` → same, but a YOOtheme CHILD
-└── gate/                      ← copied to the project ROOT (merge .ddev/), then gate tokens rendered
+├── gate/                      ← copied to the project ROOT (merge .ddev/), then gate tokens rendered
+├── package-gate/              ← the package overlay: rendered over gate/ onto a package root by bin/package-gate.sh
+└── bin/package-gate.sh        ← the renderer (host-side, bash + jq)
 ```
 
 Neither `ntdst-core/` nor `ntdst-baseline/` directories exist in this repo —
@@ -185,7 +194,7 @@ tag needs picking up. Advance the theme and gate layer **here**, the same way
 as before.
 
 **Before pushing payload changes, run `sh gate/bin/lint-tokens.sh`** (exit 0 =
-clean). It fails on layout literals (`web/wp`, `app/content`, …) that should be
+clean; it sweeps `gate/`, `package-gate/`, `theme/` and `mu-plugins/`). It fails on layout literals (`web/wp`, `app/content`, …) that should be
 `{{GATE_WP_DIR}}` / `{{GATE_CONTENT_DIR}}` tokens. A hardcoded path is
 correct-by-coincidence on a Bedrock render and silently wrong on a stackwp one,
 so nothing catches it until a stackwp site's gate goes red.
