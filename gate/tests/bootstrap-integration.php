@@ -55,6 +55,11 @@ if (!defined('DB_NAME') || (DB_NAME !== 'wptests' && DB_NAME !== getenv('WP_TEST
 // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- CLI bootstrap output, not HTML.
 echo 'Integration suite DB: ' . DB_NAME . PHP_EOL;
 
+// The package shape's fixture site, hooked before WordPress loads (framework-tests F8); a site has none.
+if (is_file(__DIR__ . '/bootstrap-site.php')) {
+    require __DIR__ . '/bootstrap-site.php';
+}
+
 // wp-phpunit exports its location via putenv() in its composer-autoloaded
 // __loaded.php — present because the autoloader above ran; a broken install
 // fatals loudly on the require itself.

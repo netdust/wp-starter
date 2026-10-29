@@ -1,0 +1,27 @@
+# The fallback for a package without a phpstan.neon of its own; a package that has one keeps it.
+includes:
+    - vendor/szepeviktor/phpstan-wordpress/extension.neon
+
+parameters:
+    level: 6
+    # Project-local cache, never the shared system tmp — a stale cross-project entry there
+    # poisons a fresh gate with phar:// internal errors (gate/phpstan.neon says why at length).
+    tmpDir: .phpstan-cache
+    scanFiles:
+        - vendor/wp-phpunit/wp-phpunit/includes/phpunit-adapter-testcase.php
+        - vendor/wp-phpunit/wp-phpunit/includes/abstract-testcase.php
+        - vendor/wp-phpunit/wp-phpunit/includes/testcase.php
+    paths:
+        - .
+    excludePaths:
+        # A neighbour installed under mu-plugins is scanned (its symbols resolve in
+        # tests/bootstrap-site.php) but never reported on; the rest is not ours at all.
+        analyse:
+            - {{GATE_CONTENT_DIR}}/mu-plugins/* (?)
+        analyseAndScan:
+            - {{GATE_WP_DIR}} (?)
+            - {{GATE_CONTENT_DIR}}/themes (?)
+            - {{GATE_CONTENT_DIR}}/plugins (?)
+            - vendor (?)
+            - node_modules (?)
+            - .phpstan-cache (?)

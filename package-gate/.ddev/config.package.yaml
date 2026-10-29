@@ -1,0 +1,8 @@
+# Package-shape DDEV additions, merged beside config.gates.yaml (wptests) — DDEV runs both
+# files' hooks. Installs WordPress on first start so bin/e2e.sh has a site to seed into; the
+# admin it creates gets a random password nobody records. Needs `composer install` first.
+hooks:
+  post-start:
+    - exec: >-
+        [ -f {{GATE_WP_DIR}}/wp-load.php ] || { echo "package gate: no WordPress at {{GATE_WP_DIR}} — run composer install, then ddev restart"; exit 0; };
+        wp core is-installed 2>/dev/null || wp core install --url="$DDEV_PRIMARY_URL" --title="{{PACKAGE}} gate" --admin_user=gate-admin --admin_password="$(head -c 16 /dev/urandom | od -An -tx1 | tr -d ' \n')" --admin_email=gate@example.test --skip-email

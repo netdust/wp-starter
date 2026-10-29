@@ -1,0 +1,55 @@
+{
+    "require-dev": {
+        "roots/wordpress": "*",
+        "roots/wp-config": "*",
+        "wp-phpunit/wp-phpunit": "*",
+        "yoast/phpunit-polyfills": "^4.0",
+        "wpackagist-theme/twentytwentyfive": "*",
+        "brain/monkey": "^2.7",
+        "phpstan/phpstan": "^2.2",
+        "szepeviktor/phpstan-wordpress": "^2.0",
+        "php-stubs/wp-cli-stubs": "^2.12",
+        "wp-coding-standards/wpcs": "^3.4",
+        "phpcompatibility/phpcompatibility-wp": "^2.1",
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.2",
+        "roave/security-advisories": "dev-latest"
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://wpackagist.org",
+            "only": ["wpackagist-plugin/*", "wpackagist-theme/*"]
+        }
+    ],
+    "config": {
+        "platform": {"php": "8.3"},
+        "process-timeout": 0,
+        "preferred-install": {"netdust/*": "source", "*": "dist"},
+        "allow-plugins": {
+            "composer/installers": true,
+            "roots/wordpress-core-installer": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    },
+    "extra": {
+        "installer-paths": {
+            "{{GATE_CONTENT_DIR}}/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
+            "{{GATE_CONTENT_DIR}}/plugins/{$name}/": ["type:wordpress-plugin"],
+            "{{GATE_CONTENT_DIR}}/themes/{$name}/": ["type:wordpress-theme"]
+        },
+        "wordpress-install-dir": "{{GATE_WP_DIR}}"
+    },
+    "scripts": {
+        "lint": "phpcs",
+        "analyse": "phpstan analyse --no-progress",
+        "audit:deps": ["@composer audit", "@audit:js"],
+        "audit:js": "sh bin/js-gate.sh audit:js 'audit --audit-level=high'",
+        "lint:js": "sh bin/js-gate.sh lint:js 'run lint' 'run lint:css'",
+        "test:unit": "vendor/bin/phpunit -c phpunit.unit.xml",
+        "test:js": "sh bin/js-gate.sh test:js 'run test'",
+        "build:check": "sh bin/js-gate.sh build:check 'run build'",
+        "test:int": "vendor/bin/phpunit -c phpunit.integration.xml",
+        "test:e2e": "sh bin/e2e.sh",
+        "gate": "sh bin/gate.sh"
+    }
+}
