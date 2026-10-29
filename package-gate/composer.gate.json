@@ -11,8 +11,7 @@
         "php-stubs/wp-cli-stubs": "^2.12",
         "wp-coding-standards/wpcs": "^3.4",
         "phpcompatibility/phpcompatibility-wp": "^2.1",
-        "dealerdirect/phpcodesniffer-composer-installer": "^1.2",
-        "roave/security-advisories": "dev-latest"
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.2"
     },
     "repositories": [
         {
