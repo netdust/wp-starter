@@ -132,7 +132,7 @@ echo "package-gate — renders the shape onto a package"
 fixture acme
 run "$PKG"
 check "exits 0" "$RC" "0"
-for f in bin/gate.sh bin/e2e.sh bin/js-gate.sh bin/lint-tokens.sh \
+for f in bin/gate.sh bin/e2e.sh bin/js-gate.sh bin/lint-tokens.sh bin/deps-latest.sh \
          tests/bootstrap-integration.php tests/wp-tests-config.php tests/bootstrap-site.php \
          tests/Integration/LoaderTest.php tests/E2E/smoke.spec.ts \
          phpunit.unit.xml phpunit.integration.xml phpcs.xml phpstan.neon playwright.config.ts package.json \
@@ -169,12 +169,11 @@ check ".gitignore keeps its own line first" "$(sed -n '1p' "$PKG/.gitignore")" "
 check ".gitignore gained the rendered /web/wp" "$(grep -c '^/web/wp$' "$PKG/.gitignore")" "1"
 check ".gitignore ends with the last gate line" "$(tail -n1 "$PKG/.gitignore")" "/.ddev/config.local.yaml"
 check ".gitattributes keeps its own line first" "$(sed -n '1p' "$PKG/.gitattributes")" "tests/ export-ignore"
-for p in /web /config /.ddev /bin/gate.sh /bin/e2e.sh /bin/js-gate.sh /bin/lint-tokens.sh /package.json \
+for p in /web /config /.ddev /bin/gate.sh /bin/e2e.sh /bin/js-gate.sh /bin/lint-tokens.sh /bin/deps-latest.sh /package.json \
          /package-lock.json /playwright.config.ts /tsconfig.json /phpunit.unit.xml /phpunit.integration.xml \
          /phpstan.neon /phpcs.xml /wp-cli.yml /.gate-no-theme-js /README-testing.md /.phpstan-cache; do
   check ".gitattributes export-ignores $p" "$(has "^$p export-ignore$" "$PKG/.gitattributes")" "yes"
 done
-check "no export-ignore for a path the shape did not write" "$(has '^/bin/deps-latest.sh export-ignore$' "$PKG/.gitattributes")" "no"
 rm -rf "$WORK"
 
 echo "package-gate — a former gate script survives as gate:package; the tiers take the shape's values"
