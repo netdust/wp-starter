@@ -22,6 +22,10 @@
 
 declare(strict_types=1);
 
+// wp-phpunit's installer runs this file in its own process, without the suite bootstrap; the
+// classmap-autoloaded mu-plugins need the autoloader (framework-tests F8, from laika).
+require_once dirname(__DIR__) . '/vendor/autoload.php';
+
 // Stack layout (rendered by scaffold_wp_starter): WordPress core lives in {{GATE_WP_DIR}} (trailing slash required).
 define('ABSPATH', dirname(__DIR__) . '/{{GATE_WP_DIR}}/');
 define('WP_CONTENT_DIR', dirname(__DIR__) . '/{{GATE_CONTENT_DIR}}');

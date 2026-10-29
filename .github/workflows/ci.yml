@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: shell gates are valid bash
         run: |
-          for f in gate/bin/*.sh; do bash -n "$f" || exit 1; done
+          for f in gate/bin/*.sh bin/*.sh; do bash -n "$f" || exit 1; done
 
       # Parsing is not behaviour. js-gate.sh decides WHICH packages the three
       # JS tiers run, and whether zero packages is a failure or a declared
@@ -27,3 +27,20 @@ jobs:
       # eyeballed.
       - name: js-gate behaves
         run: sh tests/js-gate.test.sh
+
+      # The package shape: bin/package-gate.sh renders gate/ plus the package-gate/
+      # overlay onto a wordpress-muplugin package and refuses a non-package or a
+      # conflict before writing anything. jq and git are on ubuntu-latest.
+      - name: package-gate renders and refuses
+        run: sh tests/package-gate.test.sh
+
+      # deps:latest reads the lock and goes red behind the newest tag; gate.sh
+      # dispatches the eleven tiers in the locked order, fail-fast, and runs a
+      # package's gate:package only when it declares one.
+      - name: deps:latest and the tier order
+        run: sh tests/deps-latest.test.sh && sh tests/gate-tiers.test.sh
+
+      # Every payload line is tokenized: a layout literal is correct on a Bedrock
+      # render and silently wrong on a stackwp one.
+      - name: payload is tokenized
+        run: sh gate/bin/lint-tokens.sh

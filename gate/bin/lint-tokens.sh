@@ -17,7 +17,7 @@ cd "$(dirname "$0")/../.." || exit 1
 # Layout literals: <web|app>/<wp|app|content>. Lines already carrying a token are
 # fine — that is the rendered form, e.g. `{{GATE_CONTENT_DIR}}/mu-plugins`.
 matches=$(
-    grep -rnE '\b(web|app)/(wp|app|content)\b' gate/ theme/ mu-plugins/ 2>/dev/null \
+    grep -rnE '\b(web|app)/(wp|app|content)\b' gate/ package-gate/ theme/ mu-plugins/ 2>/dev/null \
         | grep -v '{{GATE_' \
         | grep -v '{{SLUG' \
         | grep -v '\.phpstan-cache/' \

@@ -7,7 +7,7 @@ or CI loop runs is a tier of `composer gate` — no check runs anywhere that
 
 ## 1. The gates
 
-`composer gate` (mirror: `ddev gate`) runs all nine tiers cheapest-first,
+`composer gate` (mirror: `ddev gate`) runs all eleven tiers cheapest-first,
 fail-fast, from the **host**: the first red tier stops the run, names itself on
 stderr, and propagates its real exit code (`bin/gate.sh`).
 
@@ -18,16 +18,18 @@ stderr, and propagates its real exit code (`bin/gate.sh`).
 | 3 | `composer analyse` | `ddev analyse` | PHPStan static analysis | **host only** — the phpstan cache is context-coupled; a container run poisons the mounted cache for the host-orchestrated gate | ~1 s |
 | 4 | `composer audit:deps` | `ddev audit` | `composer audit` + `npm audit --audit-level=high` (theme) | either | ~3 s |
 | 5 | `composer test:unit` | `ddev test-unit` | PHP unit tier: Brain Monkey, no WordPress, no DB | either | ~1 s |
-| 6 | `composer test:js` | `ddev test-js` | Vitest: theme JS unit tests | either | ~1.5 s |
-| 7 | `composer build:check` | `ddev build-check` | Vite production build resolves | either | ~1 s |
-| 8 | `ddev composer test:int` | `ddev test-int` | Real WordPress against the dedicated `wptests` DB | **in-container only** | ~1.5 s |
-| 9 | `composer test:e2e` | `ddev test-e2e` | Playwright against the live DDEV URL, wp-cli-seeded fixtures (after a `tsc --noEmit` preflight) | **host only** | ~7 s |
-| all | `composer gate` | `ddev gate` | tiers 1–9 in order | host (hops into the container for tier 8) | ~15 s warm |
+| 6 | `composer gate:package` | — | the package's own checks, kept from its former `gate` script when the shape was adopted (§6); a site never has one, and the gate says `skipped` | either | package-defined |
+| 7 | `composer test:js` | `ddev test-js` | Vitest: theme JS unit tests | either | ~1.5 s |
+| 8 | `composer build:check` | `ddev build-check` | Vite production build resolves | either | ~1 s |
+| 9 | `sh bin/deps-latest.sh` | — (no composer mirror; `gate` runs it) | `composer outdated --locked --direct --strict` on `roots/wordpress`, `wp-phpunit/wp-phpunit` and `netdust/*`: red when any is behind its newest tag or cannot be resolved; fix: widen an exact constraint if Composer marks it `~`, then `composer update <names> --with-dependencies` and commit the lock | host (SSH agent) | ~3 s |
+| 10 | `ddev composer test:int` | `ddev test-int` | Real WordPress against the dedicated `wptests` DB | **in-container only** | ~1.5 s |
+| 11 | `composer test:e2e` | `ddev test-e2e` | Playwright against the live DDEV URL, wp-cli-seeded fixtures (after a `tsc --noEmit` preflight) | **host only** | ~7 s |
+| all | `composer gate` | `ddev gate` | tiers 1–11 in order | host (hops into the container for tier 10) | ~15 s warm |
 
-- Tier 8 is in-container because `tests/wp-tests-config.php` resolves DB host
+- Tier 10 is in-container because `tests/wp-tests-config.php` resolves DB host
   `db`, which only exists on the container network; the gate hops in via
   `ddev composer test:int` automatically.
-- Tier 9 is host-side because the Playwright browsers live on the host;
+- Tier 11 is host-side because the Playwright browsers live on the host;
   `bin/e2e.sh` derives the site URL from DDEV — never hardcode it.
 - `composer format` (Pint) is **deliberately outside the gate**: formatting is
   editor-side. Run `composer format` to check, `composer format:fix` to apply;
@@ -105,9 +107,13 @@ d. **When `test:int` is red,** `ddev composer test:int` shows only the exit
 e. **A stopped DDEV project self-heals:** `composer gate` auto-starts the
    containers at `test:int` (adds ~18 s; observed cold run ~31 s vs ~13–15 s
    warm — docs/gate-falsifiability.md, A1 edge run 1).
-f. **PHPUnit is pinned `^9.6` project-wide** — wp-phpunit's ceiling (no
-   release supports PHPUnit ≥ 10). Do not bump PHPUnit without checking
-   wp-phpunit first.
+f. **PHPUnit stays on `^9.6`.** wp-phpunit requires `yoast/phpunit-polyfills`, and no
+   polyfills release admits PHPUnit 10 (3.x: 6.4–9 and 11; 4.0: 7.5–9, 11 and 12), so a
+   manifest pinning `^10.5` cannot even resolve beside wp-phpunit — Composer refuses at
+   install. Verified 2026-10-29 on the first package render (ntdst-core on WordPress 7.1.4,
+   wp-phpunit 7.1.3): PHPUnit 9.6.38 ran core's 1,229 unit tests and the integration suite
+   green. PHPUnit 11 is admitted by polyfills 4.0 but untested on WordPress 7.1's test case;
+   on 10+ the 9-schema XMLs (`cacheResultFile`) print a deprecation, not a failure.
 g. **PHP-compat sniffs run PHPCompatibility 9.3.5, which predates PHP 8** —
    functions removed in PHP 8.x are not yet flagged; adopt the v10 line when
    released.
@@ -117,3 +123,63 @@ g. **PHP-compat sniffs run PHPCompatibility 9.3.5, which predates PHP 8** —
 Every gate tier has a recorded red demonstration — a deliberate violation, the
 non-zero exit, and the green re-run — in `docs/gate-falsifiability.md`.
 If you add a gate, prove it can fail before you trust it green.
+
+## 6. The package shape
+
+One gate, two shapes (`netdust-wp:wp-testing`; spec wp-ai-base R8–R9). A site is born with
+`gate/` through the scaffold; a package — a `composer.json` of type `wordpress-muplugin` —
+hosts its own WordPress in `require-dev` and renders the same gate onto its own root, so
+`composer gate` runs every tier, integration included, on the package's own DDEV project.
+Not used, by name: Playground, Blueprints, wp-env, a shared test site.
+
+**Adopting it**, from a clone of `netdust/wp-starter`, on a package whose main file
+`<name>.php` sits at its root:
+
+1. `bash <wp-starter>/bin/package-gate.sh <package-root>` renders the shape, merges the
+   composer fragment and appends the `.gitignore` / `.gitattributes` lines; it prints `kept:`
+   for a `phpcs.xml` or `phpstan.neon` the package already has — its own tier config wins.
+2. A manifest pinning `phpunit/phpunit ^10.5` moves to `^9.6` (§4f) — Composer refuses it otherwise.
+3. `composer install`, then `npm install` (Playwright), then `ddev start`: the post-start
+   hook installs WordPress and provisions `wptests` (a running project needs `ddev restart`).
+4. Commit `composer.lock` if the renderer said it is gitignored: `deps:latest` reads the lock.
+5. Exclude `web/`, `node_modules/`, `.phpstan-cache/` and `.ddev/` from every root-walking
+   sweep the package carries — ABSPATH guards, removed-symbol greps, invariant checks,
+   integrity tests, and a `php -l` sweep over `.` (PHPStan's `resultCache.php` is not PHP) —
+   and exempt the shape's `tests/bootstrap-*.php`, `tests/wp-tests-config.php` and
+   `tests/Integration/` from the ABSPATH guard the way `tests/bootstrap.php` already is.
+6. `composer gate` is the whole Close; the package's former `gate` script runs as `gate:package`.
+
+**What the renderer refuses**, writing nothing: no `composer.json`, a type other than
+`wordpress-muplugin`, no `<name>.php` at the root, a path under a site's
+`{{GATE_CONTENT_DIR}}/mu-plugins/`, or a shape file that already exists with other content
+(`bin/gate.sh`, `tests/bootstrap-integration.php`, …) — move it aside or make it identical.
+A second run on an adopted package changes nothing.
+
+**The loader shim** `{{GATE_CONTENT_DIR}}/mu-plugins/<name>loader.php` requires the repo
+root's `<name>.php`: the gate tests the working copy, never a composer-installed copy. A
+package requiring `netdust/ntdst-core` also gets wp-starter's `ntdst-coreloader.php`; a
+neighbour stays wherever the package declares it (`require` or `require-dev`) and
+`deps:latest` reads it there. A package that boots on an `NTDST_Bootstrap` config keeps it in
+`tests/Integration/site.php`; `tests/bootstrap-site.php` boots it with a site's hook timing,
+and a package without that file runs its integration suite on plain WordPress.
+
+**A worktree is its own DDEV project**: `name:` in `.ddev/config.local.yaml` (gitignored).
+One gate at a time: `analyse` writes `.phpstan-cache/` while a `php -l` sweep reads it.
+
+**What a site installing the package receives.** Sites install `netdust/*` from source, so
+the committed shape travels: `.ddev/`, `.gate-no-theme-js`, `.phpstan-cache/.gitignore`,
+`README-testing.md`, `bin/{gate,e2e,js-gate,lint-tokens,deps-latest}.sh`,
+`config/application.php`, `package.json`, `package-lock.json`, `phpstan.neon`,
+`phpunit.{unit,integration}.xml`, `playwright.config.ts`, `tsconfig.json`, `wp-cli.yml`,
+`tests/` (both bootstraps, `wp-tests-config.php`, `bootstrap-site.php`,
+`Integration/LoaderTest.php`, `E2E/smoke.spec.ts`), `index.php` and `wp-config.php` under
+`web/`, and the shim. Each is inert under `mu-plugins/<name>/`: a nested shim is not top-level,
+so WordPress never loads it; that `wp-config.php` sits beside no WordPress; the site's
+`phpcs.xml` / `phpstan.neon` exclude `mu-plugins/ntdst-*`; the manifest keys are root-only in
+Composer; and `ddev` is run from the site root (inside the package directory it resolves the
+package's own project). A dist install (`git archive`) carries none of it — all `export-ignore`.
+
+**A site** pinning `roots/wordpress` or `wp-phpunit/wp-phpunit` exactly goes red at
+`deps:latest` until the constraint is widened. `roave/security-advisories` is not part of the
+shape (`audit:deps` runs `composer audit`): a manifest carrying it beside `platform.php` at
+a bare minor stops resolving the day an advisory names that PHP line.

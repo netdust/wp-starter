@@ -1,0 +1,16 @@
+/{{GATE_WP_DIR}}
+/{{GATE_CONTENT_DIR}}/plugins
+/{{GATE_CONTENT_DIR}}/themes
+/{{GATE_CONTENT_DIR}}/uploads
+/{{GATE_CONTENT_DIR}}/upgrade
+/{{GATE_CONTENT_DIR}}/mu-plugins/*/
+/{{GATE_CONTENT_DIR}}/debug.log
+/vendor
+/node_modules
+/.phpunit.cache
+/.phpunit.result.cache
+/.phpstan-cache/*
+/tests/E2E/.auth
+/test-results/
+/playwright-report/
+/.ddev/config.local.yaml

@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<ruleset name="netdust-gates-package">
+    <description>Lint gate for a package without a phpcs.xml of its own: PSR-12 on tests/, WordPress security and DB sniffs on everything, PHP 8.3 compatibility. A package that has one keeps it.</description>
+
+    <file>.</file>
+
+    <exclude-pattern>*/{{GATE_WP_DIR}}/*</exclude-pattern>
+    <exclude-pattern>*/{{GATE_CONTENT_DIR}}/*</exclude-pattern>
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/node_modules/*</exclude-pattern>
+    <exclude-pattern>*/.phpstan-cache/*</exclude-pattern>
+
+    <arg name="extensions" value="php"/>
+    <arg name="colors"/>
+    <arg value="sp"/>
+
+    <!-- Style on tests/ only; the two sniff groups that catch bugs on everything. -->
+    <rule ref="PSR12">
+        <include-pattern>*/tests/*</include-pattern>
+    </rule>
+    <rule ref="PSR1.Methods.CamelCapsMethodName">
+        <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
+    <rule ref="PSR1.Classes.ClassDeclaration.MultipleClasses">
+        <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
+
+    <rule ref="WordPress.Security"/>
+    <rule ref="WordPress.DB"/>
+
+    <rule ref="PHPCompatibilityWP"/>
+    <config name="testVersion" value="8.3"/>
+</ruleset>

@@ -1,0 +1,3 @@
+path: {{GATE_WP_DIR}}
+server:
+  docroot: web
